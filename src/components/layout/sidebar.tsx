@@ -36,6 +36,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   const handleLogout = () => {
     authApi.logout();
     navigate('/login');
+    if (window.innerWidth < 768 && isOpen) {
+      onToggle();
+    }
+  };
+
+  const handleItemClick = () => {
+    if (window.innerWidth < 768 && isOpen) {
+      onToggle();
+    }
   };
 
   const allNavItems: NavItem[] = [
@@ -61,89 +70,100 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   };
 
   return (
-    <aside
-      className={`${isOpen ? 'w-64' : 'w-20'
-        } bg-content1 shadow-sm transition-all duration-300 ease-in-out fixed md:relative z-30 h-screen`}
-    >
-      <div className="flex flex-col h-full">
-        <div className={`flex items-center justify-between h-16 px-4 ${isOpen ? 'justify-between' : 'justify-center'}`}>
-          {isOpen ? (
-            <div className="flex items-center">
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          onClick={onToggle}
+        />
+      )}
+
+      <aside
+        className={`${isOpen ? 'w-64' : 'w-0 md:w-20'
+          } bg-content1 shadow-sm transition-all duration-300 ease-in-out fixed md:relative z-30 h-screen overflow-hidden border-r border-default-100`}
+      >
+        <div className="flex flex-col h-full w-full">
+          <div className={`flex items-center justify-between h-16 px-4 shrink-0 ${isOpen ? 'justify-between' : 'justify-center'}`}>
+            {isOpen ? (
+              <div className="flex items-center">
+                <Icon icon="lucide:dumbbell" className="h-8 w-8 text-primary" />
+                <span className="ml-2 text-lg font-semibold text-foreground">FitManager</span>
+              </div>
+            ) : (
               <Icon icon="lucide:dumbbell" className="h-8 w-8 text-primary" />
-              <span className="ml-2 text-lg font-semibold text-foreground">FitManager</span>
-            </div>
-          ) : (
-            <Icon icon="lucide:dumbbell" className="h-8 w-8 text-primary" />
-          )}
+            )}
 
-          <Button
-            isIconOnly
-            variant="light"
-            aria-label="Toggle sidebar"
-            className="md:flex hidden"
-            onPress={onToggle}
-          >
-            <Icon
-              icon={isOpen ? 'lucide:chevron-left' : 'lucide:chevron-right'}
-              className="h-5 w-5"
-            />
-          </Button>
-        </div>
-
-        <Divider />
-
-        <nav className="flex-1 overflow-y-auto py-4">
-          <ul className="space-y-1 px-3">
-            {navItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center px-3 py-2 rounded-md transition-colors ${isActive
-                      ? 'bg-primary-100 text-primary-600'
-                      : 'text-foreground-600 hover:bg-default-100'
-                    }`
-                  }
-                >
-                  <Icon icon={item.icon} className="h-5 w-5 flex-shrink-0" />
-                  {isOpen && <span className="ml-3 text-sm">{item.label}</span>}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <Divider />
-
-        <div className="p-4 space-y-3">
-          {isOpen && userInfo && (
-            <div className="px-2 py-2 bg-default-100 rounded-lg">
-              <User
-                name={userInfo.name}
-                description={userInfo.role}
-                avatarProps={{
-                  name: userInfo.name.charAt(0).toUpperCase(),
-                  className: "bg-primary text-white"
-                }}
-                classNames={{
-                  name: "text-sm font-medium",
-                  description: "text-xs text-default-500"
-                }}
+            <Button
+              isIconOnly
+              variant="light"
+              aria-label="Toggle sidebar"
+              className="md:flex hidden"
+              onPress={onToggle}
+            >
+              <Icon
+                icon={isOpen ? 'lucide:chevron-left' : 'lucide:chevron-right'}
+                className="h-5 w-5"
               />
-            </div>
-          )}
+            </Button>
+          </div>
 
-          <Button
-            variant="flat"
-            color="danger"
-            className={`w-full justify-start ${!isOpen && 'justify-center'}`}
-            startContent={isOpen ? <Icon icon="lucide:log-out" className="h-5 w-5" /> : undefined}
-            onPress={handleLogout}
-          >
-            {isOpen ? 'Cerrar Sesión' : <Icon icon="lucide:log-out" className="h-5 w-5" />}
-          </Button>
+          <Divider />
+
+          <nav className="flex-1 overflow-y-auto py-4 overflow-x-hidden">
+            <ul className="space-y-1 px-3">
+              {navItems.map((item) => (
+                <li key={item.path}>
+                  <NavLink
+                    to={item.path}
+                    onClick={handleItemClick}
+                    className={({ isActive }) =>
+                      `flex items-center px-3 py-2 rounded-md transition-colors whitespace-nowrap ${isActive
+                        ? 'bg-primary-100 text-primary-600'
+                        : 'text-foreground-600 hover:bg-default-100'
+                      }`
+                    }
+                  >
+                    <Icon icon={item.icon} className="h-5 w-5 flex-shrink-0" />
+                    <span className={`ml-3 text-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-0 hidden md:block'}`}>{item.label}</span>
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <Divider />
+
+          <div className="p-4 space-y-3 shrink-0">
+            {isOpen && userInfo && (
+              <div className="px-2 py-2 bg-default-100 rounded-lg whitespace-nowrap overflow-hidden">
+                <User
+                  name={userInfo.name}
+                  description={userInfo.role}
+                  avatarProps={{
+                    name: userInfo.name.charAt(0).toUpperCase(),
+                    className: "bg-primary text-white"
+                  }}
+                  classNames={{
+                    name: "text-sm font-medium",
+                    description: "text-xs text-default-500"
+                  }}
+                />
+              </div>
+            )}
+
+            <Button
+              variant="flat"
+              color="danger"
+              className={`w-full justify-start ${!isOpen && 'justify-center'}`}
+              startContent={isOpen ? <Icon icon="lucide:log-out" className="h-5 w-5" /> : undefined}
+              onPress={handleLogout}
+            >
+              {isOpen ? 'Cerrar Sesión' : <Icon icon="lucide:log-out" className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
