@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Divider, User } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { getUserRole, authApi, decodeToken } from '../../services/api';
+import logoRutinas from '../../assets/logo-rutinas-pro.png';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -86,12 +87,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         <div className="flex flex-col h-full w-full">
           <div className={`flex items-center justify-between h-16 px-4 shrink-0 ${isOpen ? 'justify-between' : 'justify-center'}`}>
             {isOpen ? (
-              <div className="flex items-center">
-                <Icon icon="lucide:dumbbell" className="h-8 w-8 text-primary" />
-                <span className="ml-2 text-lg font-semibold text-foreground">FitManager</span>
+              <div className="flex items-center justify-center w-full px-2">
+                <img src={logoRutinas} alt="Rutinas Pro" className="h-12 w-auto object-contain" />
               </div>
             ) : (
-              <Icon icon="lucide:dumbbell" className="h-8 w-8 text-primary" />
+              <img src={logoRutinas} alt="Rutinas Pro" className="h-8 w-auto object-contain" />
             )}
 
             <Button
@@ -110,22 +110,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
 
           <Divider />
 
-          <nav className="flex-1 overflow-y-auto py-4 overflow-x-hidden">
+          <nav className="flex-1 overflow-y-auto py-6 overflow-x-hidden">
             <ul className="space-y-1 px-3">
               {navItems.map((item) => (
                 <li key={item.path}>
                   <NavLink
                     to={item.path}
                     onClick={handleItemClick}
-                    className={({ isActive }) =>
-                      `flex items-center px-3 py-2 rounded-md transition-colors whitespace-nowrap ${isActive
-                        ? 'bg-primary-100 text-primary-600'
-                        : 'text-foreground-600 hover:bg-default-100'
+                    className={({ isActive: active }) =>
+                      `flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group relative whitespace-nowrap ${(item.path === '/' && location.pathname === '/') || (item.path !== '/' && location.pathname.startsWith(item.path))
+                        ? 'bg-primary-50 text-primary-700 font-semibold'
+                        : 'text-default-600 hover:text-default-900 hover:bg-default-100 font-medium'
                       }`
                     }
                   >
-                    <Icon icon={item.icon} className="h-5 w-5 flex-shrink-0" />
-                    <span className={`ml-3 text-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-0 hidden md:block'}`}>{item.label}</span>
+                    {/* Active Indicator Dot */}
+                    {((item.path === '/' && location.pathname === '/') || (item.path !== '/' && location.pathname.startsWith(item.path))) && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-primary-500 rounded-r-full" />
+                    )}
+
+                    <Icon
+                      icon={item.icon}
+                      className={`h-5 w-5 flex-shrink-0 transition-colors ${((item.path === '/' && location.pathname === '/') || (item.path !== '/' && location.pathname.startsWith(item.path)))
+                        ? 'text-primary-500'
+                        : 'text-default-400 group-hover:text-default-600'
+                        }`}
+                    />
+                    <span className={`ml-3 text-sm transition-all duration-300 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 md:opacity-0 hidden md:block -translate-x-2'}`}>
+                      {item.label}
+                    </span>
                   </NavLink>
                 </li>
               ))}
