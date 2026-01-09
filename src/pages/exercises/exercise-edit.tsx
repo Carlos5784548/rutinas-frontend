@@ -197,17 +197,11 @@ export const ExerciseEdit: React.FC = () => {
             <Controller
               name="videoUrl"
               control={control}
-              rules={{
-                pattern: {
-                  value: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/,
-                  message: 'Ingrese una URL válida de YouTube'
-                }
-              }}
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="URL del Video (opcional)"
-                  placeholder="https://www.youtube.com/watch?v=..."
+                  label="URL del Video o Imagen (GIF)"
+                  placeholder="https://ejemplo.com/video.mp4 o https://youtube.com/..."
                   isInvalid={!!errors.videoUrl}
                   errorMessage={errors.videoUrl?.message}
                 />

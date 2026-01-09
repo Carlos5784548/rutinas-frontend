@@ -5,8 +5,8 @@ import { Icon } from '@iconify/react';
 import { Header } from '../../components/clientes-components/header';
 import { ExerciseCard } from '../../components/clientes-components/exercise-card';
 import { PageTransition } from '../../components/clientes-components/page-transition';
-import { clientApi, getClienteId } from '../../services/api';
-import { RutinaResponseDTO, RutinaEjercicioResponseDTO } from '../../types';
+import { clientApi, getClienteId, exerciseApi } from '../../services/api';
+import { RutinaResponseDTO, RutinaEjercicioResponseDTO, Exercise } from '../../types';
 
 const RoutineDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -14,6 +14,7 @@ const RoutineDetailPage = () => {
     const [selectedDay, setSelectedDay] = React.useState<number>(1);
     const [routine, setRoutine] = React.useState<RutinaResponseDTO | null>(null);
     const [exercises, setExercises] = React.useState<RutinaEjercicioResponseDTO[]>([]);
+    const [exercisesMap, setExercisesMap] = React.useState<Record<number, Exercise>>({});
     const [loading, setLoading] = React.useState(true);
     const [isPaying, setIsPaying] = React.useState(false);
 
@@ -38,10 +39,17 @@ const RoutineDetailPage = () => {
             }
 
             try {
-                const [allRoutines, exercisesData] = await Promise.all([
+                const [allRoutines, exercisesData, allExercises] = await Promise.all([
                     clientApi.getMyRoutines(clienteId),
-                    clientApi.getRoutineExercises(clienteId, parseInt(id))
+                    clientApi.getRoutineExercises(clienteId, parseInt(id)),
+                    exerciseApi.getAll()
                 ]);
+
+                const exMap: Record<number, Exercise> = {};
+                allExercises.forEach(e => {
+                    if (e.id) exMap[e.id] = e;
+                });
+                setExercisesMap(exMap);
 
                 const foundRoutine = allRoutines.find(r => r.id === parseInt(id));
                 setRoutine(foundRoutine || null);
@@ -252,7 +260,7 @@ const RoutineDetailPage = () => {
                                                     sets: exercise.series,
                                                     reps: exercise.repeticiones.toString(),
                                                     rest: exercise.descansoSegundos.toString() + 's',
-                                                    image: "https://images.unsplash.com/photo-1534438327245-0451796ceb5d?w=200", // Placeholder
+                                                    image: exercisesMap[exercise.ejercicioId]?.videoUrl || "https://images.unsplash.com/photo-1534438327245-0451796ceb5d?w=200",
                                                     muscleGroup: "Varios",
                                                     esBiSerie: exercise.esBiSerie,
                                                     biSerieGrupo: exercise.biSerieGrupo

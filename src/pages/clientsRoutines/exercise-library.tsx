@@ -97,7 +97,7 @@ const ExerciseLibraryPage = () => {
                                             id: exercise.id?.toString() || "",
                                             name: exercise.nombre,
                                             muscleGroup: exercise.grupoMuscular,
-                                            image: "https://images.unsplash.com/photo-1534438327245-0451796ceb5d?w=200", // Placeholder
+                                            image: exercise.videoUrl || "https://images.unsplash.com/photo-1534438327245-0451796ceb5d?w=200",
                                             sets: 0,
                                             reps: "N/A",
                                             rest: "0s"

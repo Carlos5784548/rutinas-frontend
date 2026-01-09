@@ -141,12 +141,61 @@ const ExerciseDetailPage = () => {
 
                     {exercise.videoUrl && (
                         <Card className="mb-6">
-                            <CardBody>
-                                <h3 className="font-semibold mb-3">Video Demostrativo</h3>
-                                <div className="aspect-video bg-black rounded-lg flex items-center justify-center">
-                                    <a href={exercise.videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary flex items-center gap-2">
-                                        <Icon icon="lucide:external-link" />
-                                        Ver Video en YouTube
+                            <CardBody className="p-0 overflow-hidden">
+                                <div className="bg-black flex items-center justify-center">
+                                    {(() => {
+                                        const url = exercise.videoUrl!;
+
+                                        // Helper to extract YouTube ID
+                                        const getYoutubeId = (url: string) => {
+                                            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                                            const match = url.match(regExp);
+                                            return (match && match[2].length === 11) ? match[2] : null;
+                                        };
+
+                                        const youtubeId = getYoutubeId(url);
+                                        const isVideoFile = url.match(/\.(mp4|webm|ogg|mov)$/i);
+
+                                        if (youtubeId) {
+                                            return (
+                                                <div className="w-full aspect-video">
+                                                    <iframe
+                                                        width="100%"
+                                                        height="100%"
+                                                        src={`https://www.youtube.com/embed/${youtubeId}`}
+                                                        title="YouTube video player"
+                                                        frameBorder="0"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                        allowFullScreen
+                                                    ></iframe>
+                                                </div>
+                                            );
+                                        } else if (isVideoFile) {
+                                            return (
+                                                <video
+                                                    src={url}
+                                                    controls
+                                                    className="w-full max-h-[500px]"
+                                                    playsInline
+                                                />
+                                            );
+                                        } else {
+                                            // Assume it's an image or GIF
+                                            return (
+                                                <img
+                                                    src={url}
+                                                    alt={exercise.nombre}
+                                                    className="w-full h-auto max-h-[500px] object-contain"
+                                                />
+                                            );
+                                        }
+                                    })()}
+                                </div>
+                                <div className="p-3 bg-content1">
+                                    <p className="text-small font-semibold">Demostración</p>
+                                    <a href={exercise.videoUrl} target="_blank" rel="noopener noreferrer" className="text-tiny text-primary hover:underline flex items-center gap-1">
+                                        <Icon icon="lucide:external-link" width={12} />
+                                        Abrir enlace original
                                     </a>
                                 </div>
                             </CardBody>

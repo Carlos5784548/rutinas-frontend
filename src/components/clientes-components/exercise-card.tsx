@@ -61,18 +61,45 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 <CardBody className="p-3">
                     <div className="flex items-center gap-4 relative z-10">
                         <div className={`w-16 h-16 shrink-0 rounded-xl overflow-hidden shadow-inner flex items-center justify-center ${exercise.esBiSerie ? 'bg-primary/20' : 'bg-primary/10'}`}>
-                            {exercise.image.includes('unsplash') ? (
-                                <img
-                                    src={exercise.image}
-                                    alt={exercise.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <Icon
-                                    icon={exercise.esBiSerie ? "mdi:layers-triple" : "lucide:dumbbell"}
-                                    className="text-primary text-2xl"
-                                />
-                            )}
+                            {(() => {
+                                const url = exercise.image;
+                                if (!url) {
+                                    return (
+                                        <Icon
+                                            icon={exercise.esBiSerie ? "mdi:layers-triple" : "lucide:dumbbell"}
+                                            className="text-primary text-2xl"
+                                        />
+                                    );
+                                }
+
+                                const isVideo = url.match(/\.(mp4|webm|ogg|mov)$/i);
+
+                                if (isVideo) {
+                                    return (
+                                        <video
+                                            src={url}
+                                            className="w-full h-full object-cover"
+                                            autoPlay
+                                            loop
+                                            muted
+                                            playsInline
+                                        />
+                                    );
+                                }
+
+                                return (
+                                    <img
+                                        src={url}
+                                        alt={exercise.name}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                            e.currentTarget.parentElement?.classList.add('fallback-icon');
+                                        }}
+                                    />
+                                );
+                            })()}
+                            {/* Fallback icon if image fails to load - handled via onError above but we need a backup element if we want strict replacement */}
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
