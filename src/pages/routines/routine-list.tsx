@@ -261,91 +261,173 @@ export const RoutineList: React.FC = () => {
           />
         ) : (
           <>
-            <Table removeWrapper aria-label="Tabla de rutinas">
-              <TableHeader>
-                <TableColumn>NOMBRE</TableColumn>
-                <TableColumn>CLIENTE</TableColumn>
-                <TableColumn>ENFOQUE</TableColumn>
-                <TableColumn>ESTADO</TableColumn>
-                <TableColumn>FECHA INICIO</TableColumn>
-                <TableColumn>FECHA FIN</TableColumn>
-                <TableColumn>ACCIONES</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {paginatedRoutines.map((routine) => (
-                  <TableRow key={routine.id}>
-                    <TableCell>{routine.nombre}</TableCell>
-                    <TableCell>{getClientName(routine.clienteId)}</TableCell>
-                    <TableCell>
-                      <Chip color={getEnfoqueColor(routine.enfoque)} size="sm">
-                        {routine.enfoque}
-                      </Chip>
-                    </TableCell>
-                    <TableCell>
-                      <Chip color={getEstadoColor(routine.estado)} size="sm">
+            {/* Desktop Table View */}
+            <div className="hidden md:block">
+              <Table removeWrapper aria-label="Tabla de rutinas">
+                <TableHeader>
+                  <TableColumn>NOMBRE</TableColumn>
+                  <TableColumn>CLIENTE</TableColumn>
+                  <TableColumn>ENFOQUE</TableColumn>
+                  <TableColumn>ESTADO</TableColumn>
+                  <TableColumn>FECHA INICIO</TableColumn>
+                  <TableColumn>FECHA FIN</TableColumn>
+                  <TableColumn>ACCIONES</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {paginatedRoutines.map((routine) => (
+                    <TableRow key={routine.id}>
+                      <TableCell>{routine.nombre}</TableCell>
+                      <TableCell>{getClientName(routine.clienteId)}</TableCell>
+                      <TableCell>
+                        <Chip color={getEnfoqueColor(routine.enfoque)} size="sm">
+                          {routine.enfoque}
+                        </Chip>
+                      </TableCell>
+                      <TableCell>
+                        <Chip color={getEstadoColor(routine.estado)} size="sm">
+                          {routine.estado}
+                        </Chip>
+                      </TableCell>
+                      <TableCell>{formatDate(routine.fechaInicio)}</TableCell>
+                      <TableCell>{formatDate(routine.fechaFin)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            as={Link}
+                            to={`/rutinas/${routine.id}`}
+                            size="sm"
+                            variant="flat"
+                            color="primary"
+                            isIconOnly
+                          >
+                            <Icon icon="lucide:eye" className="h-4 w-4" />
+                          </Button>
+
+                          <Dropdown>
+                            <DropdownTrigger>
+                              <Button isIconOnly size="sm" variant="light">
+                                <Icon icon="lucide:more-vertical" className="h-4 w-4" />
+                              </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu aria-label="Acciones de rutina">
+                              <DropdownItem
+                                key="view"
+                                onPress={() => navigate(`/rutinas/${routine.id}`)}
+                                startContent={<Icon icon="lucide:eye" className="h-4 w-4" />}
+                              >
+                                Ver detalles
+                              </DropdownItem>
+                              <DropdownItem
+                                key="edit"
+                                onPress={() => navigate(`/rutinas/${routine.id}/editar`)}
+                                startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
+                              >
+                                Editar
+                              </DropdownItem>
+                              <DropdownItem
+                                key="add-exercise"
+                                onPress={() => navigate(`/rutinas/${routine.id}`)}
+                                startContent={<Icon icon="lucide:plus" className="h-4 w-4" />}
+                              >
+                                Añadir Ejercicios
+                              </DropdownItem>
+                              <DropdownItem
+                                key="delete"
+                                className="text-danger"
+                                color="danger"
+                                startContent={<Icon icon="lucide:ban" className="h-4 w-4" />}
+                                onPress={() => handleDeleteClick(routine)}
+                              >
+                                Cancelar Rutina
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden flex flex-col gap-3 p-4">
+              {paginatedRoutines.map((routine) => (
+                <div key={routine.id} className="bg-default-50 border border-default-200 rounded-xl p-4 shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-bold text-base line-clamp-1">{routine.nombre}</h3>
+                      <p className="text-xs text-default-500 mb-1">{getClientName(routine.clienteId)}</p>
+                      <Chip color={getEstadoColor(routine.estado)} size="sm" variant="flat" className="h-6 text-[10px]">
                         {routine.estado}
                       </Chip>
-                    </TableCell>
-                    <TableCell>{formatDate(routine.fechaInicio)}</TableCell>
-                    <TableCell>{formatDate(routine.fechaFin)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          as={Link}
-                          to={`/rutinas/${routine.id}`}
-                          size="sm"
-                          variant="flat"
-                          color="primary"
-                          isIconOnly
-                        >
-                          <Icon icon="lucide:eye" className="h-4 w-4" />
+                    </div>
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button isIconOnly size="sm" variant="light" className="-mr-2 -mt-1">
+                          <Icon icon="lucide:more-vertical" className="h-4 w-4" />
                         </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu aria-label="Acciones de rutina">
+                        <DropdownItem
+                          key="view"
+                          onPress={() => navigate(`/rutinas/${routine.id}`)}
+                          startContent={<Icon icon="lucide:eye" className="h-4 w-4" />}
+                        >
+                          Ver detalles
+                        </DropdownItem>
+                        <DropdownItem
+                          key="edit"
+                          onPress={() => navigate(`/rutinas/${routine.id}/editar`)}
+                          startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
+                        >
+                          Editar
+                        </DropdownItem>
+                        <DropdownItem
+                          key="add-exercise"
+                          onPress={() => navigate(`/rutinas/${routine.id}`)}
+                          startContent={<Icon icon="lucide:plus" className="h-4 w-4" />}
+                        >
+                          Añadir Ejercicios
+                        </DropdownItem>
+                        <DropdownItem
+                          key="delete"
+                          className="text-danger"
+                          color="danger"
+                          startContent={<Icon icon="lucide:ban" className="h-4 w-4" />}
+                          onPress={() => handleDeleteClick(routine)}
+                        >
+                          Cancelar Rutina
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </div>
 
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button isIconOnly size="sm" variant="light">
-                              <Icon icon="lucide:more-vertical" className="h-4 w-4" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu aria-label="Acciones de rutina">
-                            <DropdownItem
-                              key="view"
-                              onPress={() => navigate(`/rutinas/${routine.id}`)}
-                              startContent={<Icon icon="lucide:eye" className="h-4 w-4" />}
-                            >
-                              Ver detalles
-                            </DropdownItem>
-                            <DropdownItem
-                              key="edit"
-                              onPress={() => navigate(`/rutinas/${routine.id}/editar`)}
-                              startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
-                            >
-                              Editar
-                            </DropdownItem>
-                            <DropdownItem
-                              key="add-exercise"
-                              onPress={() => navigate(`/rutinas/${routine.id}`)}
-                              startContent={<Icon icon="lucide:plus" className="h-4 w-4" />}
-                            >
-                              Añadir Ejercicios
-                            </DropdownItem>
-                            <DropdownItem
-                              key="delete"
-                              className="text-danger"
-                              color="danger"
-                              startContent={<Icon icon="lucide:ban" className="h-4 w-4" />}
-                              onPress={() => handleDeleteClick(routine)}
-                            >
-                              Cancelar Rutina
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
+                  <div className="mt-3 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-default-500">Enfoque</span>
+                      <Chip color={getEnfoqueColor(routine.enfoque)} size="sm" variant="flat" className="h-5 text-[10px] px-1">
+                        {routine.enfoque}
+                      </Chip>
+                    </div>
+                    <div className="flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-default-100">
+                      <div className="flex items-center gap-1 text-default-500">
+                        <Icon icon="lucide:calendar" width={12} />
+                        <span>Inicio</span>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      <span className="font-medium">{formatDate(routine.fechaInicio)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-default-100">
+                      <div className="flex items-center gap-1 text-default-500">
+                        <Icon icon="lucide:calendar-check" width={12} />
+                        <span>Fin</span>
+                      </div>
+                      <span className="font-medium">{formatDate(routine.fechaFin)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <div className="flex justify-between items-center p-4">
               <p className="text-sm text-default-500">

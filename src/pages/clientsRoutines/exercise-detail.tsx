@@ -9,6 +9,63 @@ import { exerciseApi, clientApi, getClienteId } from '../../services/api';
 import { Exercise, ProgresoEjercicioResponseDTO } from '../../types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+const MediaRenderer = ({ url, alt }: { url: string; alt: string }) => {
+    const [error, setError] = React.useState(false);
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 bg-default-100/50 text-foreground-400">
+                <Icon icon="lucide:image-off" className="text-4xl mb-2 opacity-50" />
+                <p className="text-xs font-medium">No se pudo cargar la vista previa</p>
+            </div>
+        );
+    }
+
+    const getYoutubeId = (url: string) => {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    };
+
+    const youtubeId = getYoutubeId(url);
+    const isVideoFile = url.match(/\.(mp4|webm|ogg|mov)$/i);
+
+    if (youtubeId) {
+        return (
+            <div className="w-full aspect-video">
+                <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${youtubeId}`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                ></iframe>
+            </div>
+        );
+    } else if (isVideoFile) {
+        return (
+            <video
+                src={url}
+                controls
+                className="w-full max-h-[500px]"
+                playsInline
+                onError={() => setError(true)}
+            />
+        );
+    } else {
+        return (
+            <img
+                src={url}
+                alt={alt}
+                className="w-full h-auto max-h-[500px] object-contain"
+                onError={() => setError(true)}
+            />
+        );
+    }
+};
+
 const ExerciseDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -142,54 +199,8 @@ const ExerciseDetailPage = () => {
                     {exercise.videoUrl && (
                         <Card className="mb-6">
                             <CardBody className="p-0 overflow-hidden">
-                                <div className="bg-black flex items-center justify-center">
-                                    {(() => {
-                                        const url = exercise.videoUrl!;
-
-                                        // Helper to extract YouTube ID
-                                        const getYoutubeId = (url: string) => {
-                                            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-                                            const match = url.match(regExp);
-                                            return (match && match[2].length === 11) ? match[2] : null;
-                                        };
-
-                                        const youtubeId = getYoutubeId(url);
-                                        const isVideoFile = url.match(/\.(mp4|webm|ogg|mov)$/i);
-
-                                        if (youtubeId) {
-                                            return (
-                                                <div className="w-full aspect-video">
-                                                    <iframe
-                                                        width="100%"
-                                                        height="100%"
-                                                        src={`https://www.youtube.com/embed/${youtubeId}`}
-                                                        title="YouTube video player"
-                                                        frameBorder="0"
-                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                        allowFullScreen
-                                                    ></iframe>
-                                                </div>
-                                            );
-                                        } else if (isVideoFile) {
-                                            return (
-                                                <video
-                                                    src={url}
-                                                    controls
-                                                    className="w-full max-h-[500px]"
-                                                    playsInline
-                                                />
-                                            );
-                                        } else {
-                                            // Assume it's an image or GIF
-                                            return (
-                                                <img
-                                                    src={url}
-                                                    alt={exercise.nombre}
-                                                    className="w-full h-auto max-h-[500px] object-contain"
-                                                />
-                                            );
-                                        }
-                                    })()}
+                                <div className="bg-black flex items-center justify-center min-h-[200px]">
+                                    <MediaRenderer url={exercise.videoUrl} alt={exercise.nombre} />
                                 </div>
                                 <div className="p-3 bg-content1">
                                     <p className="text-small font-semibold">Demostración</p>

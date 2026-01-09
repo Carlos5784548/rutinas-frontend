@@ -56,11 +56,11 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
             <Card
                 isPressable
                 onPress={() => navigate(`/cliente-app/exercises/${exercise.id}`)}
-                className={`overflow-hidden border ${exercise.esBiSerie ? 'border-primary/40 bg-primary/5' : 'border-divider bg-content2/30'} shadow-sm hover:border-primary/50 transition-all active:scale-[0.98]`}
+                className={`overflow-hidden border-none ${exercise.esBiSerie ? 'bg-primary/5' : 'bg-content1'} shadow-sm hover:shadow-md transition-all duration-300 active:scale-[0.98] rounded-2xl group`}
             >
                 <CardBody className="p-3">
                     <div className="flex items-center gap-4 relative z-10">
-                        <div className={`w-16 h-16 shrink-0 rounded-xl overflow-hidden shadow-inner flex items-center justify-center ${exercise.esBiSerie ? 'bg-primary/20' : 'bg-primary/10'}`}>
+                        <div className={`w-16 h-16 shrink-0 rounded-2xl overflow-hidden shadow-sm flex items-center justify-center bg-default-100 group-hover:shadow-md transition-all`}>
                             {(() => {
                                 const url = exercise.image;
                                 if (!url) {
@@ -103,24 +103,24 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                                <h3 className="font-bold text-base truncate">{exercise.name}</h3>
+                                <h3 className="font-bold text-base truncate text-foreground-900">{exercise.name}</h3>
                                 {exercise.esBiSerie && (
                                     <Chip
                                         size="sm"
                                         variant="flat"
                                         color="primary"
-                                        className="h-4 px-1 text-[8px] font-black uppercase"
+                                        className="h-4 px-1 text-[8px] font-black uppercase tracking-wider"
                                     >
                                         B-S {exercise.biSerieGrupo}
                                     </Chip>
                                 )}
                             </div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                                <span className={`text-[10px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded-md bg-${muscleGroupColors[exercise.muscleGroup as keyof typeof muscleGroupColors] || 'default'}/20 text-${muscleGroupColors[exercise.muscleGroup as keyof typeof muscleGroupColors] || 'default'}-600`}>
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-${muscleGroupColors[exercise.muscleGroup as keyof typeof muscleGroupColors] || 'default'}/10 text-${muscleGroupColors[exercise.muscleGroup as keyof typeof muscleGroupColors] || 'default'}-600`}>
                                     {exercise.muscleGroup}
                                 </span>
                                 {exercise.esBiSerie && (
-                                    <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
+                                    <span className="text-[10px] font-bold text-primary flex items-center gap-0.5 opacity-80">
                                         <Icon icon="mdi:link-variant" width={10} />
                                         Bi-serie
                                     </span>
@@ -128,22 +128,22 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             </div>
 
                             {showDetails && exercise.sets ? (
-                                <div className="flex items-center gap-4 mt-2">
-                                    <div className="flex items-center gap-1">
-                                        <Icon icon="lucide:repeat" className="text-foreground-400" width={12} />
-                                        <span className="text-[11px] font-bold text-foreground-600">{exercise.sets}×{exercise.reps}</span>
+                                <div className="flex items-center gap-4 mt-2.5">
+                                    <div className="flex items-center gap-1.5">
+                                        <Icon icon="lucide:repeat" className="text-foreground-400" width={14} />
+                                        <span className="text-xs font-semibold text-foreground-700">{exercise.sets} × {exercise.reps}</span>
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <Icon icon="lucide:clock" className="text-foreground-400" width={12} />
-                                        <span className="text-[11px] font-bold text-foreground-600">{exercise.rest}</span>
+                                    <div className="flex items-center gap-1.5">
+                                        <Icon icon="lucide:clock" className="text-foreground-400" width={14} />
+                                        <span className="text-xs font-semibold text-foreground-700">{exercise.rest}</span>
                                     </div>
                                 </div>
                             ) : (
                                 <p className="text-tiny text-foreground-400 mt-1 font-medium italic">Toca para ver detalles</p>
                             )}
                         </div>
-                        <div className="bg-primary/5 p-2 rounded-full">
-                            <Icon icon="lucide:chevron-right" className="text-primary" width={16} />
+                        <div className="bg-default-100 p-2 rounded-full group-hover:bg-primary/10 transition-colors">
+                            <Icon icon="lucide:chevron-right" className="text-foreground-400 group-hover:text-primary transition-colors" width={18} />
                         </div>
                     </div>
                 </CardBody>

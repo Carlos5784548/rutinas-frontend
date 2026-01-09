@@ -81,12 +81,25 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ routine, index }) => {
                 {/* Main Card Container */}
                 <div className={`
                     relative h-full flex flex-col overflow-hidden rounded-[2rem] border 
-                    transition-all duration-500 ease-out
+                    transition-all duration-500 ease-out z-0
                     ${isLocked
                         ? 'bg-zinc-900 border-zinc-800'
-                        : 'bg-white border-zinc-200 hover:border-zinc-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-zinc-200/50'
+                        : 'border-zinc-200/20 hover:border-zinc-300/40 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/50'
                     }
                 `}>
+                    {/* Background Image & Overlay */}
+                    {!isLocked && (
+                        <>
+                            <div className="absolute inset-0 z-0">
+                                <img
+                                    src="/routine-card-bg.jpg"
+                                    alt="Background"
+                                    className="w-full h-full object-cover opacity-100"
+                                />
+                            </div>
+                            <div className="absolute inset-0 z-0 bg-gradient-to-br from-zinc-900/95 via-zinc-900/80 to-zinc-900/40 backdrop-blur-[1px]" />
+                        </>
+                    )}
 
                     {/* Unique Identifier Stripe */}
                     <div className={`h-2 w-full ${isLocked ? 'bg-zinc-800' : 'bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900'}`} />
@@ -95,15 +108,15 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ routine, index }) => {
                         {/* Header */}
                         <div className="flex justify-between items-start mb-6">
                             <Chip
-                                startContent={<Icon icon={statusConfig.icon} width={14} />}
-                                variant="flat"
+                                startContent={<Icon icon={statusConfig.icon} width={14} className="text-white" />}
+                                variant="solid"
                                 color={statusConfig.color as any}
-                                className={`border-0 font-bold text-[10px] uppercase tracking-wider h-7 ${isLocked ? 'bg-white/10 text-white' : ''}`}
+                                className={`border-0 font-bold text-[10px] uppercase tracking-wider h-7 text-white shadow-sm ${isLocked ? 'bg-white/10' : ''}`}
                             >
                                 {statusConfig.text}
                             </Chip>
                             {!isLocked && (
-                                <div className="text-xs font-semibold text-zinc-400 bg-zinc-100 px-3 py-1 rounded-full">
+                                <div className="text-xs font-bold text-white bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full shadow-sm">
                                     {formatDate(routine.fechaInicio)} - {formatDate(routine.fechaFin)}
                                 </div>
                             )}
@@ -111,12 +124,14 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ routine, index }) => {
 
                         {/* Title Section */}
                         <div className="mb-8">
-                            <h3 className={`text-2xl md:text-3xl font-black tracking-tight leading-none mb-3 ${isLocked ? 'text-white' : 'text-zinc-900'}`}>
+                            <h3 className={`text-2xl md:text-3xl font-black tracking-tight leading-none mb-3 text-white drop-shadow-md`}>
                                 {routine.nombre}
                             </h3>
                             <div className="flex items-center gap-2">
-                                <Icon icon={focusIconMap[routine.enfoque] || 'lucide:target'} className={isLocked ? "text-zinc-500" : "text-primary"} width={16} />
-                                <span className={`text-sm font-medium ${isLocked ? 'text-zinc-500' : 'text-zinc-500'}`}>
+                                <div className="p-1.5 rounded-full bg-white/10 backdrop-blur-sm">
+                                    <Icon icon={focusIconMap[routine.enfoque] || 'lucide:target'} className="text-white" width={14} />
+                                </div>
+                                <span className="text-sm font-bold text-zinc-100/90 tracking-wide">
                                     Enfoque: {routine.enfoque}
                                 </span>
                             </div>
@@ -125,12 +140,12 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ routine, index }) => {
                         {/* Schedule Preview */}
                         {!isLocked && schedule.length > 0 && (
                             <div className="mb-8">
-                                <p className="text-[10px] uppercase tracking-wider text-zinc-400 font-bold mb-3">Cronograma Semanal</p>
+                                <p className="text-[10px] uppercase tracking-widest text-zinc-300 font-bold mb-3 pl-1">Cronograma Semanal</p>
                                 <div className="flex flex-wrap gap-2">
                                     {schedule.map((item, idx) => (
-                                        <div key={idx} className="flex flex-col bg-zinc-50 border border-zinc-100 rounded-xl p-2 min-w-[70px]">
-                                            <span className="text-[10px] text-zinc-400 font-bold uppercase mb-0.5">Día {item.day}</span>
-                                            <span className="text-xs font-bold text-zinc-700 truncate max-w-[80px]">{item.muscle}</span>
+                                        <div key={idx} className="flex flex-col bg-black/40 border border-white/10 rounded-xl p-2 min-w-[70px] backdrop-blur-md shadow-sm">
+                                            <span className="text-[9px] text-zinc-300 font-bold uppercase mb-0.5">Día {item.day}</span>
+                                            <span className="text-xs font-bold text-white truncate max-w-[80px]">{item.muscle}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -158,7 +173,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ routine, index }) => {
                             </div>
                         ) : (
                             <Button
-                                className="w-full bg-zinc-900 text-white font-bold hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-900/20 h-12 rounded-xl group-hover:pl-6 group-hover:pr-4 justify-between"
+                                className="w-full bg-white text-zinc-950 font-bold hover:bg-zinc-200 transition-all shadow-lg shadow-black/20 h-12 rounded-xl group-hover:pl-6 group-hover:pr-4 justify-between"
                                 endContent={<Icon icon="lucide:arrow-right" className="transition-transform group-hover:translate-x-1" />}
                                 onPress={() => navigate(`/cliente-app/routines/${routine.id}`)}
                             >

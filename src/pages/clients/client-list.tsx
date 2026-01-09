@@ -177,81 +177,151 @@ export const ClientList: React.FC = () => {
           />
         ) : (
           <>
-            <Table removeWrapper aria-label="Tabla de clientes">
-              <TableHeader>
-                <TableColumn>NOMBRE</TableColumn>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn>TELÉFONO</TableColumn>
-                <TableColumn>EDAD</TableColumn>
-                <TableColumn>ACCIONES</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {paginatedClients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell>{client.nombre} {client.apellido}</TableCell>
-                    <TableCell>{client.email}</TableCell>
-                    <TableCell>{client.telefono}</TableCell>
-                    <TableCell>{client.edad}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          as={Link}
-                          to={`/clientes/${client.id}`}
-                          size="sm"
-                          variant="flat"
-                          color="primary"
-                          isIconOnly
-                        >
-                          <Icon icon="lucide:eye" className="h-4 w-4" />
-                        </Button>
+            {/* Desktop Table View */}
+            <div className="hidden md:block">
+              <Table removeWrapper aria-label="Tabla de clientes">
+                <TableHeader>
+                  <TableColumn>NOMBRE</TableColumn>
+                  <TableColumn>EMAIL</TableColumn>
+                  <TableColumn>TELÉFONO</TableColumn>
+                  <TableColumn>EDAD</TableColumn>
+                  <TableColumn>ACCIONES</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {paginatedClients.map((client) => (
+                    <TableRow key={client.id}>
+                      <TableCell>{client.nombre} {client.apellido}</TableCell>
+                      <TableCell>{client.email}</TableCell>
+                      <TableCell>{client.telefono}</TableCell>
+                      <TableCell>{client.edad}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            as={Link}
+                            to={`/clientes/${client.id}`}
+                            size="sm"
+                            variant="flat"
+                            color="primary"
+                            isIconOnly
+                          >
+                            <Icon icon="lucide:eye" className="h-4 w-4" />
+                          </Button>
 
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button isIconOnly size="sm" variant="light">
-                              <Icon icon="lucide:more-vertical" className="h-4 w-4" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu aria-label="Acciones de cliente">
-                            <DropdownItem
-                              key="view"
-                              as={Link}
-                              to={`/clientes/${client.id}`}
-                              startContent={<Icon icon="lucide:eye" className="h-4 w-4" />}
-                            >
-                              Ver detalles
-                            </DropdownItem>
-                            <DropdownItem
-                              key="edit"
-                              startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
-                              onPress={() => navigate(`/clientes/${client.id}/editar`)}
-                            >
-                              Editar
-                            </DropdownItem>
-                            <DropdownItem
-                              key="routines"
-                              as={Link}
-                              to={`/clientes/${client.id}`}
-                              startContent={<Icon icon="lucide:clipboard-list" className="h-4 w-4" />}
-                            >
-                              Ver Rutinas
-                            </DropdownItem>
-                            <DropdownItem
-                              key="delete"
-                              className="text-danger"
-                              color="danger"
-                              startContent={<Icon icon="lucide:trash" className="h-4 w-4" />}
-                              onPress={() => handleDeleteClick(client)}
-                            >
-                              Eliminar
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
+                          <Dropdown>
+                            <DropdownTrigger>
+                              <Button isIconOnly size="sm" variant="light">
+                                <Icon icon="lucide:more-vertical" className="h-4 w-4" />
+                              </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu aria-label="Acciones de cliente">
+                              <DropdownItem
+                                key="view"
+                                startContent={<Icon icon="lucide:eye" className="h-4 w-4" />}
+                                onPress={() => navigate(`/clientes/${client.id}`)}
+                              >
+                                Ver detalles
+                              </DropdownItem>
+                              <DropdownItem
+                                key="edit"
+                                startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
+                                onPress={() => navigate(`/clientes/${client.id}/editar`)}
+                              >
+                                Editar
+                              </DropdownItem>
+                              <DropdownItem
+                                key="routines"
+                                startContent={<Icon icon="lucide:clipboard-list" className="h-4 w-4" />}
+                                onPress={() => navigate(`/clientes/${client.id}`)}
+                              >
+                                Ver Rutinas
+                              </DropdownItem>
+                              <DropdownItem
+                                key="delete"
+                                className="text-danger"
+                                color="danger"
+                                startContent={<Icon icon="lucide:trash" className="h-4 w-4" />}
+                                onPress={() => handleDeleteClick(client)}
+                              >
+                                Eliminar
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden flex flex-col gap-3 p-4">
+              {paginatedClients.map((client) => (
+                <div key={client.id} className="bg-default-50 border border-default-200 rounded-xl p-4 shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <Icon icon="lucide:user" width={20} />
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      <div>
+                        <h3 className="font-bold text-base">{client.nombre} {client.apellido}</h3>
+                        <p className="text-xs text-default-500">{client.email}</p>
+                      </div>
+                    </div>
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button isIconOnly size="sm" variant="light" className="-mr-2">
+                          <Icon icon="lucide:more-vertical" className="h-4 w-4" />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu aria-label="Acciones de cliente">
+                        <DropdownItem
+                          key="view"
+                          startContent={<Icon icon="lucide:eye" className="h-4 w-4" />}
+                          onPress={() => navigate(`/clientes/${client.id}`)}
+                        >
+                          Ver detalles
+                        </DropdownItem>
+                        <DropdownItem
+                          key="edit"
+                          startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
+                          onPress={() => navigate(`/clientes/${client.id}/editar`)}
+                        >
+                          Editar
+                        </DropdownItem>
+                        <DropdownItem
+                          key="routines"
+                          startContent={<Icon icon="lucide:clipboard-list" className="h-4 w-4" />}
+                          onPress={() => navigate(`/clientes/${client.id}`)}
+                        >
+                          Ver Rutinas
+                        </DropdownItem>
+                        <DropdownItem
+                          key="delete"
+                          className="text-danger"
+                          color="danger"
+                          startContent={<Icon icon="lucide:trash" className="h-4 w-4" />}
+                          onPress={() => handleDeleteClick(client)}
+                        >
+                          Eliminar
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <div className="bg-white p-2 rounded-lg border border-default-100">
+                      <p className="text-[10px] text-default-400 uppercase font-bold">Teléfono</p>
+                      <p className="text-xs font-medium truncate">{client.telefono}</p>
+                    </div>
+                    <div className="bg-white p-2 rounded-lg border border-default-100">
+                      <p className="text-[10px] text-default-400 uppercase font-bold">Edad</p>
+                      <p className="text-xs font-medium">{client.edad} años</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <div className="flex justify-between items-center p-4">
               <p className="text-sm text-default-500">

@@ -151,11 +151,12 @@ const RoutineDetailPage = () => {
                 showBackButton
                 action={
                     <Button
-                        color="primary"
+                        className="bg-primary text-white font-bold shadow-lg shadow-primary/30"
+                        radius="full"
                         size="sm"
                         isDisabled={dailyExercises.length === 0}
                         onPress={() => navigate(`/cliente-app/training/${routine.id}/${selectedDay}`)}
-                        startContent={<Icon icon="lucide:play" />}
+                        startContent={<Icon icon="lucide:play" width={16} />}
                     >
                         Iniciar
                     </Button>
@@ -164,22 +165,34 @@ const RoutineDetailPage = () => {
 
             <div className="p-4">
                 <div className="max-w-4xl mx-auto">
-                    <Card className="mb-6">
+                    <Card className="mb-8 border-none shadow-md rounded-3xl overflow-hidden">
                         <CardBody className="p-0">
-                            <div className="relative h-48 bg-primary/10 flex items-center justify-center">
-                                <Icon icon="lucide:dumbbell" className="text-primary/40" width={80} />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
-                                    <div className="flex flex-col gap-2">
+                            <div className="relative h-48 bg-gray-900 flex items-center justify-center">
+                                <img
+                                    src="/gym-hero.jpg"
+                                    alt="Training Hero"
+                                    className="absolute inset-0 w-full h-full object-cover opacity-80"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
+                                    <div className="flex flex-col gap-3">
                                         <div className="flex items-center gap-2">
                                             <Chip
                                                 size="sm"
-                                                color="primary"
+                                                variant="solid"
+                                                classNames={{
+                                                    base: "bg-success/90 backdrop-blur-md",
+                                                    content: "text-white font-bold text-[10px] tracking-wider uppercase px-1"
+                                                }}
                                             >
                                                 {routine.estado}
                                             </Chip>
                                             <Chip
                                                 size="sm"
-                                                color="secondary"
+                                                variant="solid"
+                                                classNames={{
+                                                    base: "bg-white/20 backdrop-blur-md border border-white/30",
+                                                    content: "text-white font-bold text-[10px] tracking-wider uppercase px-1"
+                                                }}
                                             >
                                                 {routine.enfoque}
                                             </Chip>
@@ -218,13 +231,14 @@ const RoutineDetailPage = () => {
                                 {dayNames[selectedDay] || `Día ${selectedDay}`}
                             </h3>
                             <Button
-                                color="primary"
-                                size="sm"
+                                className="bg-primary text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                size="md"
+                                radius="full"
                                 isDisabled={dailyExercises.length === 0}
                                 onPress={() => navigate(`/cliente-app/training/${routine.id}/${selectedDay}`)}
-                                startContent={<Icon icon="lucide:play" />}
+                                startContent={<Icon icon="lucide:play" width={20} className="fill-current" />}
                             >
-                                Iniciar Entrenamiento
+                                INICIAR ENTRENAMIENTO
                             </Button>
                         </div>
 

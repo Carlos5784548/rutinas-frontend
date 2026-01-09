@@ -1,16 +1,16 @@
 import React from 'react';
-import { 
-  Table, 
-  TableHeader, 
-  TableColumn, 
-  TableBody, 
-  TableRow, 
-  TableCell, 
-  Chip, 
-  Button, 
-  Dropdown, 
-  DropdownTrigger, 
-  DropdownMenu, 
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Chip,
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
   DropdownItem,
   Input,
   Select,
@@ -19,7 +19,7 @@ import {
   Pagination
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { PageHeader } from '../../components/ui/page-header';
 import { EmptyState } from '../../components/ui/empty-state';
 import { ConfirmationModal } from '../../components/ui/confirmation-modal';
@@ -29,6 +29,7 @@ import { addToast } from '@heroui/react';
 import { ErrorAlert } from '../../components/ui/error-alert';
 
 export const ExerciseList: React.FC = () => {
+  const navigate = useNavigate();
   const [exercises, setExercises] = React.useState<Exercise[]>([]);
   const [muscleGroups, setMuscleGroups] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -39,30 +40,30 @@ export const ExerciseList: React.FC = () => {
   const [exerciseToDelete, setExerciseToDelete] = React.useState<Exercise | null>(null);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [error, setError] = React.useState<any>(null);
-  
+
   const rowsPerPage = 10;
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  
+
   const filteredExercises = React.useMemo(() => {
     return exercises.filter(exercise => {
       const matchesMuscleGroup = !filter.grupoMuscular || exercise.grupoMuscular === filter.grupoMuscular;
-      const matchesSearch = !searchQuery || 
+      const matchesSearch = !searchQuery ||
         exercise.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
         exercise.descripcion.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       return matchesMuscleGroup && matchesSearch;
     });
   }, [exercises, filter, searchQuery]);
-  
+
   const paginatedExercises = filteredExercises.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredExercises.length / rowsPerPage);
-  
+
   React.useEffect(() => {
     fetchExercises();
     fetchMuscleGroups();
   }, []);
-  
+
   const fetchExercises = async () => {
     try {
       setLoading(true);
@@ -76,7 +77,7 @@ export const ExerciseList: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   const fetchMuscleGroups = async () => {
     try {
       // This is a mock implementation since the API endpoint might not exist
@@ -92,7 +93,7 @@ export const ExerciseList: React.FC = () => {
       console.error('Error fetching muscle groups:', error);
     }
   };
-  
+
   React.useEffect(() => {
     const uniqueMuscleGroups = new Set<string>();
     exercises.forEach(exercise => {
@@ -102,25 +103,25 @@ export const ExerciseList: React.FC = () => {
     });
     setMuscleGroups(Array.from(uniqueMuscleGroups));
   }, [exercises]);
-  
+
   const handleFilterChange = (key: keyof ExerciseFilter, value: any) => {
     setFilter(prev => ({ ...prev, [key]: value }));
     setPage(1);
   };
-  
+
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setPage(1);
   };
-  
+
   const handleDeleteClick = (exercise: Exercise) => {
     setExerciseToDelete(exercise);
     setDeleteModalOpen(true);
   };
-  
+
   const handleDeleteConfirm = async () => {
     if (!exerciseToDelete?.id) return;
-    
+
     try {
       setIsDeleting(true);
       await exerciseApi.delete(exerciseToDelete.id);
@@ -143,24 +144,24 @@ export const ExerciseList: React.FC = () => {
       setExerciseToDelete(null);
     }
   };
-  
+
   return (
     <div>
-      <PageHeader 
-        title="Ejercicios" 
-        description="Gestiona los ejercicios disponibles" 
+      <PageHeader
+        title="Ejercicios"
+        description="Gestiona los ejercicios disponibles"
         actionLabel="Crear Ejercicio"
         actionPath="/ejercicios/crear"
       />
-      
+
       {error && (
-        <ErrorAlert 
-          error={error} 
-          onRetry={fetchExercises} 
-          onDismiss={() => setError(null)} 
+        <ErrorAlert
+          error={error}
+          onRetry={fetchExercises}
+          onDismiss={() => setError(null)}
         />
       )}
-      
+
       <div className="bg-content1 rounded-lg shadow-sm overflow-hidden">
         <div className="p-4 flex flex-col sm:flex-row gap-4">
           <Input
@@ -170,7 +171,7 @@ export const ExerciseList: React.FC = () => {
             onValueChange={handleSearchChange}
             className="sm:max-w-xs"
           />
-          
+
           <Select
             placeholder="Filtrar por grupo muscular"
             selectedKeys={filter.grupoMuscular ? [filter.grupoMuscular] : []}
@@ -181,13 +182,13 @@ export const ExerciseList: React.FC = () => {
             className="sm:max-w-xs"
           >
             {muscleGroups.map((group) => (
-              <SelectItem key={group} value={group}>
+              <SelectItem key={group}>
                 {group}
               </SelectItem>
             ))}
           </Select>
-          
-          <Button 
+
+          <Button
             variant="flat"
             color="primary"
             onPress={() => {
@@ -201,7 +202,7 @@ export const ExerciseList: React.FC = () => {
             Reiniciar
           </Button>
         </div>
-        
+
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <Spinner size="lg" color="primary" />
@@ -216,97 +217,165 @@ export const ExerciseList: React.FC = () => {
           />
         ) : (
           <>
-            <Table removeWrapper aria-label="Tabla de ejercicios">
-              <TableHeader>
-                <TableColumn>NOMBRE</TableColumn>
-                <TableColumn>GRUPO MUSCULAR</TableColumn>
-                <TableColumn>DESCRIPCIÓN</TableColumn>
-                <TableColumn>VIDEO</TableColumn>
-                <TableColumn>ACCIONES</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {paginatedExercises.map((exercise) => (
-                  <TableRow key={exercise.id}>
-                    <TableCell>{exercise.nombre}</TableCell>
-                    <TableCell>
-                      <Chip size="sm" variant="flat">
-                        {exercise.grupoMuscular}
-                      </Chip>
-                    </TableCell>
-                    <TableCell>
-                      <div className="max-w-xs truncate">
-                        {exercise.descripcion}
+            {/* Desktop Table View */}
+            <div className="hidden md:block">
+              <Table removeWrapper aria-label="Tabla de ejercicios">
+                <TableHeader>
+                  <TableColumn>NOMBRE</TableColumn>
+                  <TableColumn>GRUPO MUSCULAR</TableColumn>
+                  <TableColumn>DESCRIPCIÓN</TableColumn>
+                  <TableColumn>VIDEO</TableColumn>
+                  <TableColumn>ACCIONES</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {paginatedExercises.map((exercise) => (
+                    <TableRow key={exercise.id}>
+                      <TableCell>{exercise.nombre}</TableCell>
+                      <TableCell>
+                        <Chip size="sm" variant="flat">
+                          {exercise.grupoMuscular}
+                        </Chip>
+                      </TableCell>
+                      <TableCell>
+                        <div className="max-w-xs truncate">
+                          {exercise.descripcion}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {exercise.videoUrl ? (
+                          <Button
+                            as="a"
+                            href={exercise.videoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            size="sm"
+                            variant="flat"
+                            color="secondary"
+                            startContent={<Icon icon="lucide:video" className="h-4 w-4" />}
+                          >
+                            Ver Video
+                          </Button>
+                        ) : (
+                          <span className="text-default-400 text-sm">No disponible</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            as={Link}
+                            to={`/ejercicios/${exercise.id}/editar`}
+                            size="sm"
+                            variant="flat"
+                            color="primary"
+                            isIconOnly
+                          >
+                            <Icon icon="lucide:pencil" className="h-4 w-4" />
+                          </Button>
+
+                          <Dropdown>
+                            <DropdownTrigger>
+                              <Button isIconOnly size="sm" variant="light">
+                                <Icon icon="lucide:more-vertical" className="h-4 w-4" />
+                              </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu aria-label="Acciones de ejercicio">
+                              <DropdownItem
+                                key="edit"
+                                onPress={() => navigate(`/ejercicios/${exercise.id}/editar`)}
+                                startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
+                              >
+                                Editar
+                              </DropdownItem>
+                              <DropdownItem
+                                key="delete"
+                                className="text-danger"
+                                color="danger"
+                                startContent={<Icon icon="lucide:trash" className="h-4 w-4" />}
+                                onPress={() => handleDeleteClick(exercise)}
+                              >
+                                Eliminar
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden flex flex-col gap-3 p-4">
+              {paginatedExercises.map((exercise) => (
+                <div key={exercise.id} className="bg-default-50 border border-default-200 rounded-xl p-4 shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1 mr-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <Chip size="sm" variant="flat" color="primary" className="h-5 text-[10px] px-1">
+                          {exercise.grupoMuscular}
+                        </Chip>
+                        {exercise.videoUrl && (
+                          <Icon icon="lucide:video" className="text-secondary w-4 h-4" />
+                        )}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {exercise.videoUrl ? (
-                        <Button
-                          as="a"
-                          href={exercise.videoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          size="sm"
-                          variant="flat"
-                          color="secondary"
-                          startContent={<Icon icon="lucide:video" className="h-4 w-4" />}
-                        >
-                          Ver Video
+                      <h3 className="font-bold text-base line-clamp-1">{exercise.nombre}</h3>
+                    </div>
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button isIconOnly size="sm" variant="light" className="-mr-2 -mt-1">
+                          <Icon icon="lucide:more-vertical" className="h-4 w-4" />
                         </Button>
-                      ) : (
-                        <span className="text-default-400 text-sm">No disponible</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          as={Link}
-                          to={`/ejercicios/${exercise.id}/editar`}
-                          size="sm"
-                          variant="flat"
-                          color="primary"
-                          isIconOnly
+                      </DropdownTrigger>
+                      <DropdownMenu aria-label="Acciones de ejercicio">
+                        <DropdownItem
+                          key="edit"
+                          onPress={() => navigate(`/ejercicios/${exercise.id}/editar`)}
+                          startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
                         >
-                          <Icon icon="lucide:pencil" className="h-4 w-4" />
-                        </Button>
-                        
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button isIconOnly size="sm" variant="light">
-                              <Icon icon="lucide:more-vertical" className="h-4 w-4" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu aria-label="Acciones de ejercicio">
-                            <DropdownItem
-                              key="edit"
-                              as={Link}
-                              to={`/ejercicios/${exercise.id}/editar`}
-                              startContent={<Icon icon="lucide:pencil" className="h-4 w-4" />}
-                            >
-                              Editar
-                            </DropdownItem>
-                            <DropdownItem
-                              key="delete"
-                              className="text-danger"
-                              color="danger"
-                              startContent={<Icon icon="lucide:trash" className="h-4 w-4" />}
-                              onPress={() => handleDeleteClick(exercise)}
-                            >
-                              Eliminar
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            
+                          Editar
+                        </DropdownItem>
+                        <DropdownItem
+                          key="delete"
+                          className="text-danger"
+                          color="danger"
+                          startContent={<Icon icon="lucide:trash" className="h-4 w-4" />}
+                          onPress={() => handleDeleteClick(exercise)}
+                        >
+                          Eliminar
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </div>
+
+                  <div className="mt-2">
+                    <p className="text-xs text-default-500 line-clamp-2 bg-white p-2 rounded-lg border border-default-100 min-h-[40px]">
+                      {exercise.descripcion || "Sin descripción"}
+                    </p>
+                  </div>
+
+                  {exercise.videoUrl && (
+                    <div className="mt-2 pt-2 border-t border-default-100">
+                      <a
+                        href={exercise.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-secondary flex items-center gap-1 font-medium"
+                      >
+                        <Icon icon="lucide:external-link" width={12} />
+                        Ver Video Demostrativo
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
             <div className="flex justify-between items-center p-4">
               <p className="text-sm text-default-500">
                 Mostrando {Math.min(filteredExercises.length, startIndex + 1)}-{Math.min(filteredExercises.length, endIndex)} de {filteredExercises.length} ejercicios
               </p>
-              
+
               <Pagination
                 total={totalPages}
                 initialPage={1}
@@ -317,7 +386,7 @@ export const ExerciseList: React.FC = () => {
           </>
         )}
       </div>
-      
+
       <ConfirmationModal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
