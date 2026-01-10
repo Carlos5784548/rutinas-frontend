@@ -23,8 +23,8 @@ import {
 } from '../types';
 import { addToast } from '@heroui/react';
 
-const API_URL = 'http://localhost:8080/api';
-const AUTH_URL = 'http://localhost:8080';
+const API_URL = 'https://rutinas-backend.onrender.com/api';
+const AUTH_URL = 'https://rutinas-backend.onrender.com';
 
 const api = axios.create({
   baseURL: API_URL,
