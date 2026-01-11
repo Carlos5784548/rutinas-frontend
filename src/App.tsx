@@ -37,6 +37,7 @@ import HistoryPage from './pages/clientsRoutines/history';
 import CalendarPage from './pages/clientsRoutines/calendar';
 import { BottomNavigation } from './components/clientes-components/bottom-navigation';
 import { RoutineEdit } from './pages/routines/RoutineEdit';
+import PaymentSuccessPage from './pages/clientsRoutines/payment-success';
 
 // Component to redirect to role-specific dashboard
 const RoleBasedDashboard: React.FC = () => {
@@ -52,12 +53,19 @@ const RoleBasedDashboard: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
+  const isPaymentRedirect = queryParams.has('collection_status') || queryParams.has('payment_id');
+
   switch (role) {
     case 'ADMIN':
       return <Navigate to="/admin" replace />;
     case 'ENTRENADOR':
       return <Navigate to="/entrenador" replace />;
     case 'CLIENTE':
+      if (isPaymentRedirect) {
+        return <Navigate to={{ pathname: "/cliente-app/payment-success", search }} replace />;
+      }
       return <Navigate to="/cliente-app" replace />;
     default:
       return <Navigate to="/login" replace />;
@@ -258,6 +266,7 @@ const ClientApp: React.FC = () => {
             <Route path="exercises/:id" element={<ExerciseDetailPage />} />
             <Route path="history" element={<HistoryPage />} />
             <Route path="calendar" element={<CalendarPage />} />
+            <Route path="payment-success" element={<PaymentSuccessPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
