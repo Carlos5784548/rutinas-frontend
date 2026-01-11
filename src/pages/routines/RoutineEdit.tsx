@@ -147,7 +147,8 @@ export const RoutineEdit: React.FC = () => {
         clienteId: (data as any).clienteId || (data.cliente?.id),
         estado: data.estado || 'ACTIVA',
         monto: data.monto || 0,
-        descripcionDias: data.descripcionDias || ''
+        descripcionDias: data.descripcionDias || '',
+        ejercicios: data.ejercicios || []
       });
 
       if (data.descripcionDias) {
@@ -173,7 +174,25 @@ export const RoutineEdit: React.FC = () => {
     try {
       setIsSubmitting(true);
 
-      await routineApi.update(parseInt(id), data);
+      // Clean up the exercises data to match RutinaEjercicioRequestDTO if needed
+      const requestData: RutinaRequestDTO = {
+        ...data,
+        ejercicios: data.ejercicios?.map(ex => ({
+          series: ex.series,
+          repeticiones: ex.repeticiones,
+          descansoSegundos: ex.descansoSegundos,
+          dia: ex.dia,
+          ejercicioId: (ex as any).ejercicioId || (ex as any).ejercicio?.id,
+          esBiSerie: ex.esBiSerie,
+          biSerieGrupo: ex.biSerieGrupo
+        }))
+      };
+
+      console.log('Datos a enviar al backend (limpios):', requestData);
+      console.log('ID de la rutina:', id);
+
+      const response = await routineApi.update(parseInt(id), requestData);
+      console.log('Respuesta del backend:', response);
 
       addToast({
         title: 'Rutina actualizada',
@@ -181,11 +200,15 @@ export const RoutineEdit: React.FC = () => {
         severity: 'success'
       });
       navigate('/rutinas');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating routine:', error);
+
+      const errorMsg = error.response?.data?.message || error.message || 'No se pudo actualizar la rutina';
+      const errorDetails = error.response?.data?.errors ? JSON.stringify(error.response.data.errors) : '';
+
       addToast({
         title: 'Error',
-        description: 'No se pudo actualizar la rutina',
+        description: `${errorMsg} ${errorDetails}`,
         severity: 'danger'
       });
     } finally {
