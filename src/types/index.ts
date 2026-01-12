@@ -237,3 +237,24 @@ export interface RoutineFilter {
   clienteId?: number;
   search?: string;
 }
+
+// Payment types
+export type EstadoPago = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
+
+export interface Pago {
+  id: number;
+  cliente: Client;
+  rutina: Routine;
+  estado: EstadoPago;
+  monto: number;
+  fechaCreacion: string;
+  fechaAprobacion?: string;
+  pasarela: string;
+  idExterno: string;
+}
+
+export interface PagoStats {
+  pendientes: number;
+  aprobados: number;
+  totalMesActual: number;
+}

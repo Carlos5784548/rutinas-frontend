@@ -52,6 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     { label: 'Dashboard', path: '/', icon: 'lucide:layout-dashboard' },
     { label: 'Usuarios', path: '/usuarios', icon: 'lucide:users', roles: ['ADMIN'] },
     { label: 'Clientes', path: '/clientes', icon: 'lucide:user', roles: ['ADMIN', 'ENTRENADOR'] },
+    { label: 'Pagos', path: '/pagos', icon: 'lucide:banknote', roles: ['ADMIN', 'ENTRENADOR'] },
     { label: 'Rutinas', path: '/rutinas', icon: 'lucide:clipboard-list', roles: ['ADMIN', 'ENTRENADOR', 'CLIENTE'] },
     { label: 'Ejercicios', path: '/ejercicios', icon: 'lucide:dumbbell', roles: ['ADMIN', 'ENTRENADOR'] },
   ];

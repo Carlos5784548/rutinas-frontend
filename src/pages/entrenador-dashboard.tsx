@@ -5,9 +5,11 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/ui/page-header';
 import { trainerApi, routineApi, exerciseApi, getEntrenadorId } from '../services/api';
 import { Client } from '../types';
+import { usePagoStats } from '../hooks/usePagoStats';
 
 export const EntrenadorDashboard: React.FC = () => {
     const entrenadorId = getEntrenadorId();
+    const { stats: paymentStats, loading: loadingPayments } = usePagoStats();
     const [stats, setStats] = React.useState({
         clients: 0,
         routines: 0,
@@ -70,6 +72,30 @@ export const EntrenadorDashboard: React.FC = () => {
         }
     ];
 
+    const paymentCards = [
+        {
+            title: 'Pagos Pendientes',
+            value: paymentStats.pendientes,
+            icon: 'lucide:clock',
+            color: 'bg-warning-100 text-warning-600',
+            path: '/pagos?estado=PENDIENTE'
+        },
+        {
+            title: 'Pagos Aprobados',
+            value: paymentStats.aprobados,
+            icon: 'lucide:check-circle',
+            color: 'bg-success-100 text-success-600',
+            path: '/pagos?estado=APROBADO'
+        },
+        {
+            title: 'Recaudado (Mes)',
+            value: `$${paymentStats.totalMesActual.toLocaleString()}`,
+            icon: 'lucide:dollar-sign',
+            color: 'bg-primary-100 text-primary-600',
+            path: '/pagos'
+        }
+    ];
+
     return (
         <div>
             <PageHeader
@@ -77,7 +103,7 @@ export const EntrenadorDashboard: React.FC = () => {
                 description="Gestiona tus clientes y rutinas de entrenamiento"
             />
 
-            {loading ? (
+            {(loading || loadingPayments) ? (
                 <div className="flex justify-center items-center h-64">
                     <Spinner size="lg" color="primary" />
                 </div>
@@ -91,6 +117,28 @@ export const EntrenadorDashboard: React.FC = () => {
                                         <div className="flex flex-col gap-1 z-10">
                                             <p className="text-tiny font-bold text-default-500 uppercase tracking-wider">{stat.title}</p>
                                             <h3 className="text-4xl font-bold text-default-900 tracking-tight group-hover:text-primary transition-colors">{stat.value}</h3>
+                                        </div>
+                                        <div className={`rounded-2xl p-3 ${stat.color.replace('bg-', 'bg-opacity-20 ')} bg-opacity-10 group-hover:scale-110 transition-transform duration-300`}>
+                                            <Icon icon={stat.icon} className="h-6 w-6" />
+                                        </div>
+                                    </CardBody>
+                                </Card>
+                            </Link>
+                        ))}
+                    </div>
+
+                    <h2 className="text-xl font-bold tracking-tight text-default-900 flex items-center gap-2 mb-4">
+                        <Icon icon="lucide:banknote" className="text-primary-500" />
+                        Resumen de Pagos
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                        {paymentCards.map((stat) => (
+                            <Link to={stat.path} key={stat.title} className="block">
+                                <Card className="shadow-none border border-default-200 hover:border-primary-500/50 hover:shadow-md transition-all duration-300 h-full group cursor-pointer bg-background/60 backdrop-blur-sm">
+                                    <CardBody className="flex flex-row items-center justify-between p-6 overflow-hidden">
+                                        <div className="flex flex-col gap-1 z-10">
+                                            <p className="text-tiny font-bold text-default-500 uppercase tracking-wider">{stat.title}</p>
+                                            <h3 className="text-3xl font-bold text-default-900 tracking-tight group-hover:text-primary transition-colors">{stat.value}</h3>
                                         </div>
                                         <div className={`rounded-2xl p-3 ${stat.color.replace('bg-', 'bg-opacity-20 ')} bg-opacity-10 group-hover:scale-110 transition-transform duration-300`}>
                                             <Icon icon={stat.icon} className="h-6 w-6" />

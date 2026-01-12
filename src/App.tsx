@@ -38,6 +38,7 @@ import CalendarPage from './pages/clientsRoutines/calendar';
 import { BottomNavigation } from './components/clientes-components/bottom-navigation';
 import { RoutineEdit } from './pages/routines/RoutineEdit';
 import PaymentSuccessPage from './pages/clientsRoutines/payment-success';
+import { PagoList } from './pages/pagos/pago-list';
 
 // Component to redirect to role-specific dashboard
 const RoleBasedDashboard: React.FC = () => {
@@ -164,6 +165,15 @@ function App() {
           <Route path="crear" element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <UserCreate />
+            </ProtectedRoute>
+          } />
+        </Route>
+
+        {/* Payments - Admin and Entrenador */}
+        <Route path="pagos">
+          <Route index element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ENTRENADOR']}>
+              <PagoList />
             </ProtectedRoute>
           } />
         </Route>
