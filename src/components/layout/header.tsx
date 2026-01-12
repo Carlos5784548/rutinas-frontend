@@ -4,6 +4,9 @@ import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
 import { authApi, decodeToken, getUserRole } from '../../services/api';
 
+import { Badge } from '@heroui/react';
+import { usePagos } from '../../hooks/usePagos';
+
 interface HeaderProps {
   onMenuClick: () => void;
 }
@@ -13,6 +16,12 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const role = getUserRole();
   const tokenData = decodeToken();
   const userName = tokenData?.nombre || tokenData?.sub || 'Usuario';
+  const { pagos } = usePagos();
+
+  const unreadCount = React.useMemo(() => {
+    if (role === 'CLIENTE') return 0;
+    return pagos.filter(p => !p.visto).length;
+  }, [pagos, role]);
 
   const handleAction = (key: React.Key) => {
     switch (key) {
@@ -27,6 +36,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       case 'logout':
         authApi.logout();
         navigate('/login');
+        break;
+      case 'notifications':
+        navigate('/pagos');
         break;
       default:
         break;
@@ -46,13 +58,24 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       </Button>
 
       <div className="flex-1 flex justify-end items-center space-x-4">
-        <Button
-          variant="light"
-          isIconOnly
-          aria-label="Notifications"
-        >
-          <Icon icon="lucide:bell" className="h-5 w-5" />
-        </Button>
+        {role !== 'CLIENTE' && (
+          <Badge
+            content={unreadCount > 9 ? '+9' : unreadCount}
+            color="danger"
+            isInvisible={unreadCount === 0}
+            shape="circle"
+            size="sm"
+          >
+            <Button
+              variant="light"
+              isIconOnly
+              aria-label="Notifications"
+              onPress={() => navigate('/pagos')}
+            >
+              <Icon icon="lucide:bell" className="h-5 w-5" />
+            </Button>
+          </Badge>
+        )}
 
         <Dropdown placement="bottom-end">
           <DropdownTrigger>

@@ -4,6 +4,7 @@ import { Button, Divider, User } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { getUserRole, authApi, decodeToken } from '../../services/api';
 import logoRutinas from '../../assets/logo-rutinas-pro.png';
+import { usePagos } from '../../hooks/usePagos';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +22,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const userRole = getUserRole();
+  const { pagos } = usePagos();
+
+  const unreadCount = React.useMemo(() => {
+    if (userRole === 'CLIENTE') return 0;
+    return pagos.filter(p => !p.visto).length;
+  }, [pagos, userRole]);
 
   // Get user information from token
   const userInfo = React.useMemo(() => {
@@ -140,6 +147,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     <span className={`ml-3 text-sm transition-all duration-300 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 md:opacity-0 hidden md:block -translate-x-2'}`}>
                       {item.label}
                     </span>
+
+                    {/* Notification Badge for Payments */}
+                    {item.label === 'Pagos' && unreadCount > 0 && (
+                      <span className={`ml-auto flex items-center justify-center bg-primary-500 text-white text-[10px] font-bold rounded-full h-5 w-5 shadow-lg shadow-primary-500/30 ring-2 ring-content1 transition-all duration-300 ${!isOpen && 'absolute top-1 right-2'}`}>
+                        {unreadCount > 9 ? '+9' : unreadCount}
+                      </span>
+                    )}
                   </NavLink>
                 </li>
               ))}
