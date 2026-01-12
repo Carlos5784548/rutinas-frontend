@@ -19,6 +19,7 @@ import { PagoFilters } from '../../components/pagos/pago-filters';
 import { PagoDetailModal } from '../../components/pagos/pago-detail-modal';
 import { AsignarRutinaModal } from '../../components/pagos/asignar-rutina-modal';
 import { Pago } from '../../types';
+import { pagosApi } from '../../services/pagos.service';
 
 export const PagoList: React.FC = () => {
     const { pagos, loading, refresh } = usePagos();
@@ -57,14 +58,28 @@ export const PagoList: React.FC = () => {
         setFilteredPagos(result);
     };
 
+    const handleMarcarVisto = async (pago: Pago) => {
+        if (!pago.visto) {
+            try {
+                await pagosApi.marcarVisto(pago.id);
+                // We update local state to avoid full refresh if possible, or refresh
+                refresh();
+            } catch (error) {
+                console.error("Error marking as viewed:", error);
+            }
+        }
+    };
+
     const handleShowDetail = (pago: Pago) => {
         setSelectedPago(pago);
         onOpen();
+        handleMarcarVisto(pago);
     };
 
     const handleShowAssign = (pago: Pago) => {
         setSelectedPago(pago);
         onAssignOpen();
+        handleMarcarVisto(pago);
     };
 
     const formatDate = (dateString: string) => {
@@ -111,7 +126,10 @@ export const PagoList: React.FC = () => {
                             {filteredPagos.map((pago) => (
                                 <TableRow key={pago.id} className="hover:bg-default-50/50 transition-colors">
                                     <TableCell>
-                                        <div className="flex flex-col">
+                                        <div className="flex flex-col relative">
+                                            {!pago.visto && (
+                                                <span className="absolute -left-3 top-1 w-2 h-2 bg-primary-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.6)]" title="Nuevo" />
+                                            )}
                                             <span className="font-semibold text-default-900">{pago.cliente.nombre} {pago.cliente.apellido}</span>
                                             <span className="text-tiny text-default-500">{pago.cliente.email}</span>
                                         </div>

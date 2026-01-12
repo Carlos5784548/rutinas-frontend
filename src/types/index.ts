@@ -251,6 +251,7 @@ export interface Pago {
   fechaAprobacion?: string;
   pasarela: string;
   idExterno: string;
+  visto: boolean;
 }
 
 export interface PagoStats {
