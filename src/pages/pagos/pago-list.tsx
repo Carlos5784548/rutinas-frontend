@@ -138,7 +138,7 @@ export const PagoList: React.FC = () => {
                                         <span className="text-default-700 font-medium">{pago.rutina.nombre}</span>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="font-bold text-primary-600">${pago.monto.toLocaleString()}</span>
+                                        <span className="font-bold text-primary-600">${(pago.monto || 0).toLocaleString()}</span>
                                     </TableCell>
                                     <TableCell>
                                         <PagoStatusBadge status={pago.estado} />

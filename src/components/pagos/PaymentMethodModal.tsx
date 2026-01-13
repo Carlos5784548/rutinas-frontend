@@ -46,7 +46,7 @@ export const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                             <div className="flex flex-col gap-4">
                                 <div className="bg-zinc-800/50 p-4 rounded-2xl border border-zinc-700/50 flex justify-between items-center mb-2">
                                     <span className="text-zinc-400">Total a pagar</span>
-                                    <span className="text-2xl font-black text-white">${monto.toLocaleString()}</span>
+                                    <span className="text-2xl font-black text-white">${(monto || 0).toLocaleString()}</span>
                                 </div>
 
                                 <Button

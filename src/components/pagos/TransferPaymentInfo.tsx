@@ -84,7 +84,7 @@ export const TransferPaymentInfo: React.FC<TransferPaymentInfoProps> = ({
                                     <div className="flex justify-between items-center bg-zinc-900/50 -mx-6 -mb-6 p-6 rounded-b-xl border-t border-zinc-700/50">
                                         <div className="flex flex-col">
                                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Monto a Transferir</span>
-                                            <span className="text-2xl font-black text-white">${monto.toLocaleString()}</span>
+                                            <span className="text-2xl font-black text-white">${(monto || 0).toLocaleString()}</span>
                                         </div>
                                         <div className="bg-white/10 p-2 rounded-xl border border-white/5">
                                             <Icon icon="lucide:shield-check" className="text-white" width={24} />

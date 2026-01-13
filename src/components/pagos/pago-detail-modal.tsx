@@ -98,7 +98,7 @@ export const PagoDetailModal: React.FC<PagoDetailModalProps> = ({
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-default-500">Monto</span>
-                                    <span className="font-bold text-lg text-primary">${pago.monto.toLocaleString()}</span>
+                                    <span className="font-bold text-lg text-primary">${(pago.monto || 0).toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-default-500">Fecha de Creación</span>

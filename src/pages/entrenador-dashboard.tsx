@@ -89,7 +89,7 @@ export const EntrenadorDashboard: React.FC = () => {
         },
         {
             title: 'Recaudado (Mes)',
-            value: `$${paymentStats.totalMesActual.toLocaleString()}`,
+            value: `$${(paymentStats.totalMesActual || 0).toLocaleString()}`,
             icon: 'lucide:dollar-sign',
             color: 'bg-primary-100 text-primary-600',
             path: '/pagos'
