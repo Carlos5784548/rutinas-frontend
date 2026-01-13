@@ -5,9 +5,11 @@ import { getEntrenadorId } from '../services/api';
 
 export const usePagoStats = () => {
     const [stats, setStats] = useState<PagoStats>({
-        pendientes: 0,
-        aprobados: 0,
-        totalMesActual: 0
+        ingresosTotales: 0,
+        ingresosMesActual: 0,
+        cantidadClientesActivos: 0,
+        rutinasActivas: 0,
+        pagosPendientes: 0
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

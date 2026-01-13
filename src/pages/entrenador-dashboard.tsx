@@ -51,14 +51,14 @@ export const EntrenadorDashboard: React.FC = () => {
     const statCards = [
         {
             title: 'Mis Clientes',
-            value: stats.clients,
+            value: paymentStats.cantidadClientesActivos,
             icon: 'lucide:users',
             color: 'bg-success-100 text-success-600',
             path: '/clientes'
         },
         {
-            title: 'Rutinas Totales',
-            value: stats.routines,
+            title: 'Rutinas Activas',
+            value: paymentStats.rutinasActivas,
             icon: 'lucide:clipboard-list',
             color: 'bg-warning-100 text-warning-600',
             path: '/rutinas'
@@ -75,23 +75,23 @@ export const EntrenadorDashboard: React.FC = () => {
     const paymentCards = [
         {
             title: 'Pagos Pendientes',
-            value: paymentStats.pendientes,
+            value: paymentStats.pagosPendientes,
             icon: 'lucide:clock',
             color: 'bg-warning-100 text-warning-600',
             path: '/pagos?estado=PENDIENTE'
         },
         {
-            title: 'Pagos Aprobados',
-            value: paymentStats.aprobados,
-            icon: 'lucide:check-circle',
-            color: 'bg-success-100 text-success-600',
-            path: '/pagos?estado=APROBADO'
-        },
-        {
             title: 'Recaudado (Mes)',
-            value: `$${(paymentStats.totalMesActual || 0).toLocaleString()}`,
+            value: `$${(paymentStats.ingresosMesActual || 0).toLocaleString()}`,
             icon: 'lucide:dollar-sign',
             color: 'bg-primary-100 text-primary-600',
+            path: '/pagos'
+        },
+        {
+            title: 'Ingresos Totales',
+            value: `$${(paymentStats.ingresosTotales || 0).toLocaleString()}`,
+            icon: 'lucide:trending-up',
+            color: 'bg-success-100 text-success-600',
             path: '/pagos'
         }
     ];

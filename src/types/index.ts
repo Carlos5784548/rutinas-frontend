@@ -265,7 +265,9 @@ export interface DatosBancarios {
 }
 
 export interface PagoStats {
-  pendientes: number;
-  aprobados: number;
-  totalMesActual: number;
+  ingresosTotales: number;
+  ingresosMesActual: number;
+  cantidadClientesActivos: number;
+  rutinasActivas: number;
+  pagosPendientes: number;
 }

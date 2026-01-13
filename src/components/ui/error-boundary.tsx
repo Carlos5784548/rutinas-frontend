@@ -8,15 +8,19 @@ interface Props {
 
 interface State {
     hasError: boolean;
+    isChunkError: boolean;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
     public state: State = {
-        hasError: false
+        hasError: false,
+        isChunkError: false
     };
 
-    public static getDerivedStateFromError(): State {
-        return { hasError: true };
+    public static getDerivedStateFromError(error: Error): State {
+        const isChunkError = error.message?.includes('Failed to fetch dynamically imported module') ||
+            error.name === 'ChunkLoadError';
+        return { hasError: true, isChunkError };
     }
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -41,10 +45,12 @@ export class ErrorBoundary extends Component<Props, State> {
 
                             <div className="space-y-3">
                                 <h1 className="text-4xl font-black text-danger">
-                                    Algo salió mal
+                                    {this.state.isChunkError ? 'Nueva versión disponible' : 'Algo salió mal'}
                                 </h1>
                                 <p className="text-default-500 leading-relaxed">
-                                    Ha ocurrido un error inesperado en la aplicación. No te preocupes, podemos solucionarlo.
+                                    {this.state.isChunkError
+                                        ? 'Hemos actualizado la aplicación con mejoras. Por favor, recarga la página para continuar.'
+                                        : 'Ha ocurrido un error inesperado en la aplicación. No te preocupes, podemos solucionarlo.'}
                                 </p>
                             </div>
 
