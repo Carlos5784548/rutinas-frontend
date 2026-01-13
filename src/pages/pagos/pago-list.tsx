@@ -136,7 +136,9 @@ export const PagoList: React.FC = () => {
                                             <span className="text-tiny text-default-500">{pago.cliente?.email || 'S/D'}</span>
                                         </div>
                                     </TableCell>
-                                    <span className="text-default-700 font-medium">{pago.rutina?.nombre || 'Rutina no encontrada'}</span>
+                                    <TableCell>
+                                        <span className="text-default-700 font-medium">{pago.rutina?.nombre || 'Rutina no encontrada'}</span>
+                                    </TableCell>
                                     <TableCell>
                                         <span className="font-bold text-primary-600">${(pago.monto || 0).toLocaleString()}</span>
                                     </TableCell>
