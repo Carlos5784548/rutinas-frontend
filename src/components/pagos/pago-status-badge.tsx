@@ -26,6 +26,12 @@ export const PagoStatusBadge: React.FC<PagoStatusBadgeProps> = ({ status }) => {
             icon: 'lucide:x-circle',
             label: 'Rechazado',
             variant: 'flat' as const
+        },
+        PENDIENTE_VERIFICACION: {
+            color: 'warning' as const,
+            icon: 'lucide:alert-circle',
+            label: 'Por Verificar',
+            variant: 'flat' as const
         }
     };
 

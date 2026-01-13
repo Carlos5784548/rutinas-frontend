@@ -90,6 +90,7 @@ export const RoutineDetail: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [exerciseToDelete, setExerciseToDelete] = React.useState<RoutineExercise | null>(null);
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isOrdering, setIsOrdering] = React.useState(false);
 
   const [editingExercise, setEditingExercise] = React.useState<RoutineExercise | null>(null);
 
@@ -243,7 +244,8 @@ export const RoutineDetail: React.FC = () => {
         repeticiones: Number(data.repeticiones),
         descansoSegundos: Number(data.descansoSegundos),
         dia: Number(data.dia),
-        ejercicioId: Number(data.ejercicioId)
+        ejercicioId: Number(data.ejercicioId),
+        orden: editingExercise ? editingExercise.orden : routineExercises.filter(ex => ex.dia === Number(data.dia)).length
       };
 
       if (editingExercise) {
@@ -268,7 +270,83 @@ export const RoutineDetail: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [id, editingExercise, fetchRoutineExercises, onClose, reset]);
+  }, [id, editingExercise, fetchRoutineExercises, onClose, reset, clearEditing]);
+
+  const handleMoveExercise = React.useCallback(async (direction: 'up' | 'down', currentEx: RoutineExercise, dayExercises: RoutineExercise[]) => {
+    if (!id) return;
+    const routineId = parseInt(id);
+    const currentIndex = dayExercises.findIndex(ex => ex.id === currentEx.id);
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+    if (targetIndex < 0 || targetIndex >= dayExercises.length) return;
+
+    const targetEx = dayExercises[targetIndex];
+
+    try {
+      setIsOrdering(true);
+
+      // Assign or swap order
+      // If we don't have a bulk update, we have to do it sequentially
+      // For now, let's assume we can at least send the 'orden' in the addExercise
+      // and since the detail page "edits" by remove + add, we could do something similar
+      // but it's better to just swap and notify the user about the backend needs.
+
+      const updatedCurrent = { ...currentEx, orden: targetIndex };
+      const updatedTarget = { ...targetEx, orden: currentIndex };
+
+      // Since we don't have a proper update endpoint for routine-exercise,
+      // and the current 'edit' logic is remove+add, we'll follow that pattern
+      // but only if really necessary. For now, let's just swap locally and
+      // ask the user to implement the backend part for persistence.
+
+      // SIMULATION of persistence if backend supported update:
+      // await routineApi.updateRoutineExercise(routineId, updatedCurrent);
+      // await routineApi.updateRoutineExercise(routineId, updatedTarget);
+
+      // Let's use the current remove/add pattern (not ideal but consistent)
+      await routineApi.removeExercise(routineId, currentEx.id!);
+      await routineApi.removeExercise(routineId, targetEx.id!);
+
+      await routineApi.addExercise(routineId, {
+        ejercicioId: updatedCurrent.ejercicioId!,
+        series: updatedCurrent.series,
+        repeticiones: updatedCurrent.repeticiones,
+        descansoSegundos: updatedCurrent.descansoSegundos,
+        dia: updatedCurrent.dia,
+        esBiSerie: updatedCurrent.esBiSerie,
+        biSerieGrupo: updatedCurrent.biSerieGrupo,
+        orden: updatedCurrent.orden
+      } as any);
+
+      await routineApi.addExercise(routineId, {
+        ejercicioId: updatedTarget.ejercicioId!,
+        series: updatedTarget.series,
+        repeticiones: updatedTarget.repeticiones,
+        descansoSegundos: updatedTarget.descansoSegundos,
+        dia: updatedTarget.dia,
+        esBiSerie: updatedTarget.esBiSerie,
+        biSerieGrupo: updatedTarget.biSerieGrupo,
+        orden: updatedTarget.orden
+      } as any);
+
+      await fetchRoutineExercises(routineId);
+
+      addToast({
+        title: 'Orden actualizado',
+        description: 'Se ha cambiado el orden del ejercicio.',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error reordering exercises:', error);
+      addToast({
+        title: 'Error',
+        description: 'No se pudo actualizar el orden.',
+        severity: 'danger'
+      });
+    } finally {
+      setIsOrdering(false);
+    }
+  }, [id, fetchRoutineExercises]);
 
 
 
@@ -543,7 +621,13 @@ export const RoutineDetail: React.FC = () => {
           const groupB = b.esBiSerie ? (b.biSerieGrupo || 0) : 999;
 
           if (groupA !== groupB) return groupA - groupB;
-          // Dentro del mismo grupo (o si ambos no son bi-series), por ID
+
+          // Si tienen orden definido, usarlo
+          if (a.orden !== undefined && b.orden !== undefined) {
+            return a.orden - b.orden;
+          }
+
+          // Fallback al orden original por ID
           return (a.id || 0) - (b.id || 0);
         })
       }));
@@ -688,6 +772,28 @@ export const RoutineDetail: React.FC = () => {
                                             </div>
                                             <div className="flex sm:flex-col justify-end gap-2">
                                               <div className="flex gap-2">
+                                                <div className="flex flex-col gap-1 mr-2">
+                                                  <Button
+                                                    isIconOnly
+                                                    size="sm"
+                                                    variant="light"
+                                                    isDisabled={index === 0 || isOrdering}
+                                                    onPress={() => handleMoveExercise('up', re, exercises)}
+                                                    className="h-6 w-6"
+                                                  >
+                                                    <Icon icon="lucide:chevron-up" width={16} />
+                                                  </Button>
+                                                  <Button
+                                                    isIconOnly
+                                                    size="sm"
+                                                    variant="light"
+                                                    isDisabled={index === exercises.length - 1 || isOrdering}
+                                                    onPress={() => handleMoveExercise('down', re, exercises)}
+                                                    className="h-6 w-6"
+                                                  >
+                                                    <Icon icon="lucide:chevron-down" width={16} />
+                                                  </Button>
+                                                </div>
 
                                                 <Button
                                                   isIconOnly

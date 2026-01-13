@@ -4,7 +4,10 @@ import { Card, CardBody, Chip, Button, Spinner } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { RutinaResponseDTO } from '../../types';
 import { Icon } from '@iconify/react';
-import { clientApi, getClienteId } from '../../services/api';
+import { clientApi, getClienteId, pagosApi } from '../../services/api';
+import { PaymentMethodModal } from '../pagos/PaymentMethodModal';
+import { TransferPaymentInfo } from '../pagos/TransferPaymentInfo';
+import { DatosBancarios } from '../../types';
 
 interface RoutineCardProps {
     routine: RutinaResponseDTO;
@@ -14,6 +17,10 @@ interface RoutineCardProps {
 export const RoutineCard: React.FC<RoutineCardProps> = ({ routine, index }) => {
     const navigate = useNavigate();
     const [isPaying, setIsPaying] = React.useState(false);
+    const [isMethodModalOpen, setIsMethodModalOpen] = React.useState(false);
+    const [isTransferInfoOpen, setIsTransferInfoOpen] = React.useState(false);
+    const [bankDetails, setBankDetails] = React.useState<DatosBancarios | null>(null);
+    const [currentPagoId, setCurrentPagoId] = React.useState<number | null>(null);
 
     const focusIconMap: Record<string, string> = {
         'Tonificar': 'lucide:zap',
@@ -26,22 +33,69 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ routine, index }) => {
 
     const handleRoutinePress = async () => {
         if (isLocked) {
-            setIsPaying(true);
-            try {
-                const clienteId = getClienteId();
-                if (!clienteId) return;
-                const data = await clientApi.initiatePayment(routine.id, clienteId);
-                if (data && data.initPoint) {
-                    window.location.href = data.initPoint;
-                }
-            } catch (error) {
-                console.error("Error starting payment:", error);
-            } finally {
-                setIsPaying(false);
-            }
+            setIsMethodModalOpen(true);
             return;
         }
         navigate(`/cliente-app/routines/${routine.id}`);
+    };
+
+    const handleSelectMercadoPago = async () => {
+        setIsPaying(true);
+        try {
+            const clienteId = getClienteId();
+            if (!clienteId) return;
+            const data = await clientApi.initiatePayment(routine.id, clienteId);
+            if (data && data.initPoint) {
+                window.location.href = data.initPoint;
+            }
+        } catch (error) {
+            console.error("Error starting payment:", error);
+        } finally {
+            setIsPaying(false);
+        }
+    };
+
+    const handleSelectTransfer = async () => {
+        setIsPaying(true);
+        try {
+            const clienteId = getClienteId();
+            if (!clienteId) return;
+
+            // 1. Fetch trainer's bank details (we might need a trainerId from routine or somewhere else)
+            // For now let's assume entrenadorId 1 or fetch from a service that doesn't strictly need it if there's only one trainer
+            // Better: routine probably has trainer info? Let's check RutinaResponseDTO.
+            // If not, we might need a general endpoint for common bank details.
+
+            // Try to get details first
+            const details = await pagosApi.getBankDetails(1); // Fallback to 1 for now
+            setBankDetails(details);
+
+            // 2. Initiate transfer payment record in backend
+            const data = await clientApi.initiateTransferPayment(routine.id, clienteId);
+            setCurrentPagoId(data.pagoId);
+
+            setIsMethodModalOpen(false);
+            setIsTransferInfoOpen(true);
+        } catch (error) {
+            console.error("Error starting transfer payment:", error);
+        } finally {
+            setIsPaying(false);
+        }
+    };
+
+    const handleConfirmTransfer = async () => {
+        if (!currentPagoId) return;
+        setIsPaying(true);
+        try {
+            await clientApi.confirmTransferPayment(currentPagoId);
+            setIsTransferInfoOpen(false);
+            // Refresh routine or state
+            window.location.reload(); // Quick refresh to show "Wait for verification"
+        } catch (error) {
+            console.error("Error confirming transfer:", error);
+        } finally {
+            setIsPaying(false);
+        }
     };
 
     const statusConfig = useMemo(() => {
@@ -188,6 +242,27 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({ routine, index }) => {
                     </div>
                 </div>
             </Card>
+
+            <PaymentMethodModal
+                isOpen={isMethodModalOpen}
+                onOpenChange={setIsMethodModalOpen}
+                monto={routine.monto || 0}
+                onSelectMercadoPago={handleSelectMercadoPago}
+                onSelectTransfer={handleSelectTransfer}
+                loading={isPaying}
+            />
+
+            {bankDetails && (
+                <TransferPaymentInfo
+                    isOpen={isTransferInfoOpen}
+                    onOpenChange={setIsTransferInfoOpen}
+                    datosBancarios={bankDetails}
+                    monto={routine.monto || 0}
+                    entrenadorNombre="Tu Entrenador" // Should ideally come from backend
+                    onConfirm={handleConfirmTransfer}
+                    loading={isPaying}
+                />
+            )}
         </motion.div>
     );
 };

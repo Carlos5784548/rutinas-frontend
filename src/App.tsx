@@ -39,6 +39,7 @@ import { BottomNavigation } from './components/clientes-components/bottom-naviga
 import { RoutineEdit } from './pages/routines/RoutineEdit';
 import PaymentSuccessPage from './pages/clientsRoutines/payment-success';
 import { PagoList } from './pages/pagos/pago-list';
+import { BankDetailsSettings } from './components/pagos/BankDetailsSettings';
 
 // Component to redirect to role-specific dashboard
 const RoleBasedDashboard: React.FC = () => {
@@ -174,6 +175,17 @@ function App() {
           <Route index element={
             <ProtectedRoute allowedRoles={['ADMIN', 'ENTRENADOR']}>
               <PagoList />
+            </ProtectedRoute>
+          } />
+        </Route>
+
+        {/* Bank Details Settings - Entrenador */}
+        <Route path="ajustes-pago">
+          <Route index element={
+            <ProtectedRoute allowedRoles={['ENTRENADOR']}>
+              <div className="p-4 md:p-8">
+                <BankDetailsSettings />
+              </div>
             </ProtectedRoute>
           } />
         </Route>

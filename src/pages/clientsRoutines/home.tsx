@@ -311,7 +311,10 @@ const HomePage = () => {
                                                     <div>
                                                         <p className="font-bold text-sm">{exercise.ejercicioNombre}</p>
                                                         <p className="text-tiny text-foreground-400">
-                                                            {new Date(exercise.fecha).toLocaleDateString()}
+                                                            {(() => {
+                                                                const [year, month, day] = exercise.fecha.split('-');
+                                                                return `${day}/${month}/${year}`;
+                                                            })()}
                                                         </p>
                                                     </div>
                                                 </div>

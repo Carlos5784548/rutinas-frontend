@@ -31,10 +31,48 @@ const TrainingModePage = () => {
             }
 
             try {
-                const data = await clientApi.getRoutineExercises(clienteId, parseInt(routineId));
+                const [exercisesData, allProgress] = await Promise.all([
+                    clientApi.getRoutineExercises(clienteId, parseInt(routineId)),
+                    clientApi.getMyProgress(clienteId)
+                ]);
+
                 // Filtrar por el día seleccionado
-                const dayExercises = data.filter(e => e.dia === parseInt(dayId));
+                const dayExercises = exercisesData.filter(e => e.dia === parseInt(dayId));
                 setExercises(dayExercises);
+
+                // --- Reconstrucción del Estado Senior ---
+                const today = new Date().toISOString().split('T')[0];
+                const todayProgress = allProgress.filter(p => p.fecha === today);
+
+                const newCompletedSets: Record<number, number> = {};
+                const newWeights: Record<number, Record<number, number>> = {};
+
+                dayExercises.forEach(ex => {
+                    if (!ex.id) return;
+                    const exProgress = todayProgress.filter(p => p.rutinaEjercicioId === ex.id);
+                    if (exProgress.length > 0) {
+                        newCompletedSets[ex.id] = exProgress.length;
+                        newWeights[ex.id] = {};
+                        exProgress.forEach(p => {
+                            newWeights[ex.id!][p.serieNumero - 1] = p.peso || p.kg || 0;
+                        });
+                    }
+                });
+
+                setCompletedSets(newCompletedSets);
+                setWeights(newWeights);
+
+                // Encontrar el primer ejercicio que no esté terminado
+                const firstIncompleteIndex = dayExercises.findIndex(ex => (newCompletedSets[ex.id!] || 0) < ex.series);
+
+                if (firstIncompleteIndex !== -1) {
+                    setCurrentExerciseIndex(firstIncompleteIndex);
+                } else if (dayExercises.length > 0) {
+                    // Si todos están terminados, mostrar pantalla de finalización
+                    setIsCompleted(true);
+                }
+                // ----------------------------------------
+
             } catch (error) {
                 console.error("Error fetching exercises for training:", error);
             } finally {

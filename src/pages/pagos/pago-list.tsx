@@ -187,6 +187,7 @@ export const PagoList: React.FC = () => {
                 onOpenChange={onOpenChange}
                 pago={selectedPago}
                 onAssignRoutine={handleShowAssign}
+                onStatusChange={refresh}
             />
 
             <AsignarRutinaModal

@@ -63,6 +63,7 @@ export interface RoutineExercise {
   dia: number; // 1-7
   esBiSerie?: boolean;
   biSerieGrupo?: number | null;
+  orden?: number;
 }
 
 // API Response types
@@ -144,6 +145,7 @@ export interface RutinaEjercicioRequestDTO {
   ejercicioId: number;
   esBiSerie?: boolean;
   biSerieGrupo?: number | null;
+  orden?: number;
 }
 
 export interface RutinaRequestDTO {
@@ -181,6 +183,7 @@ export interface RutinaEjercicioResponseDTO {
   rutinaId: number;
   esBiSerie?: boolean;
   biSerieGrupo?: number | null;
+  orden?: number;
 }
 
 export interface ProgresoEjercicioRequestDTO {
@@ -239,7 +242,7 @@ export interface RoutineFilter {
 }
 
 // Payment types
-export type EstadoPago = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
+export type EstadoPago = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'PENDIENTE_VERIFICACION';
 
 export interface Pago {
   id: number;
@@ -249,9 +252,16 @@ export interface Pago {
   monto: number;
   fechaCreacion: string;
   fechaAprobacion?: string;
-  pasarela: string;
+  pasarela: 'MERCADO_PAGO' | 'TRANSFERENCIA' | string;
   idExterno: string;
+  comprobanteUrl?: string;
   visto: boolean;
+}
+
+export interface DatosBancarios {
+  cvu: string;
+  alias: string;
+  banco: string;
 }
 
 export interface PagoStats {

@@ -60,6 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     { label: 'Usuarios', path: '/usuarios', icon: 'lucide:users', roles: ['ADMIN'] },
     { label: 'Clientes', path: '/clientes', icon: 'lucide:user', roles: ['ADMIN', 'ENTRENADOR'] },
     { label: 'Pagos', path: '/pagos', icon: 'lucide:banknote', roles: ['ADMIN', 'ENTRENADOR'] },
+    { label: 'Ajustes', path: '/ajustes-pago', icon: 'lucide:settings', roles: ['ENTRENADOR'] },
     { label: 'Rutinas', path: '/rutinas', icon: 'lucide:clipboard-list', roles: ['ADMIN', 'ENTRENADOR', 'CLIENTE'] },
     { label: 'Ejercicios', path: '/ejercicios', icon: 'lucide:dumbbell', roles: ['ADMIN', 'ENTRENADOR'] },
   ];

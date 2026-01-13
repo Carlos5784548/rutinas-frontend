@@ -47,5 +47,22 @@ export const pagosApi = {
     asignarRutina: async (clienteId: number, rutina: RutinaRequestDTO): Promise<Routine> => {
         const response: AxiosResponse<Routine> = await api.post(`/rutinas/asignar/${clienteId}`, rutina);
         return response.data;
+    },
+
+    approvePayment: async (pagoId: number): Promise<void> => {
+        await api.post(`/pagos/transferencia/${pagoId}/aprobar`);
+    },
+
+    rejectPayment: async (pagoId: number, motivo?: string): Promise<void> => {
+        await api.post(`/pagos/transferencia/${pagoId}/rechazar`, { motivo });
+    },
+
+    getBankDetails: async (entrenadorId: number): Promise<any> => {
+        const response: AxiosResponse<any> = await api.get(`/entrenadores/${entrenadorId}/datos-bancarios`);
+        return response.data;
+    },
+
+    updateBankDetails: async (entrenadorId: number, data: any): Promise<void> => {
+        await api.put(`/entrenadores/${entrenadorId}/datos-bancarios`, data);
     }
 };

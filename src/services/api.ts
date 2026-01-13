@@ -22,6 +22,9 @@ import {
   RutinaResumenResponseDTO
 } from '../types';
 import { addToast } from '@heroui/react';
+import { pagosApi } from './pagos.service';
+
+export { pagosApi };
 
 const API_URL = 'https://rutinas-backend.onrender.com/api';
 const AUTH_URL = 'https://rutinas-backend.onrender.com';
@@ -234,6 +237,15 @@ export const clientApi = {
   initiatePayment: async (rutinaId: number, clienteId: number): Promise<{ initPoint: string, pagoId: number, estado: string }> => {
     const response: AxiosResponse<{ initPoint: string, pagoId: number, estado: string }> = await api.post('/pagos/iniciar', { rutinaId, clienteId });
     return response.data;
+  },
+
+  initiateTransferPayment: async (rutinaId: number, clienteId: number): Promise<any> => {
+    const response: AxiosResponse<any> = await api.post('/pagos/transferencia/iniciar', { rutinaId, clienteId });
+    return response.data;
+  },
+
+  confirmTransferPayment: async (pagoId: number): Promise<void> => {
+    await api.post(`/pagos/transferencia/${pagoId}/confirmar`);
   }
 };
 
@@ -334,7 +346,8 @@ export const routineApi = {
       ejercicioId: routineExercise.ejercicioId,
       dia: routineExercise.dia,
       esBiSerie: routineExercise.esBiSerie,
-      biSerieGrupo: routineExercise.biSerieGrupo
+      biSerieGrupo: routineExercise.biSerieGrupo,
+      orden: routineExercise.orden
     };
 
     const response: AxiosResponse<RoutineExercise> = await api.post(`/rutinas/${routineId}/ejercicios`, requestData);
