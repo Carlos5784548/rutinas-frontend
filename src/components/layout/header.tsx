@@ -149,10 +149,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             <p className="text-[11px] text-default-500 leading-tight">
                               Solicitud de pago para <span className="font-medium text-default-700">{pago.nombreRutina || 'Rutina'}</span>
                             </p>
-                            <span className="text-[10px] text-default-400 mt-1 flex items-center gap-1">
-                              <Icon icon="lucide:clock" className="w-3 h-3" />
-                              {formatDistanceToNow(new Date(pago.fechaCreacion), { addSuffix: true, locale: es })}
-                            </span>
                           </div>
                         </div>
                       ))}
@@ -161,7 +157,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 </ScrollShadow>
               </DropdownItem>
 
-              <DropdownItem key="view-all" className="h-11 border-t border-default-100 text-center text-primary font-medium hover:bg-primary/5 transition-colors">
+              <DropdownItem key="view-all" className="h-11 border-t border-default-100 text-center text-primary font-medium hover:bg-primary/5 transition-colors" onPress={() => navigate('/pagos')}>
                 Ver todas las notificaciones
               </DropdownItem>
             </DropdownMenu>

@@ -29,7 +29,11 @@ export const pagosApi = {
     getAll: async (entrenadorId: number, estado?: string): Promise<Pago[]> => {
         const params = estado ? { estado } : {};
         const response: AxiosResponse<Pago[]> = await api.get(`/entrenadores/${entrenadorId}/pagos`, { params });
-        return response.data;
+        // Normalize IDs: some endpoints might return pagoId instead of id
+        return response.data.map(pago => ({
+            ...pago,
+            id: pago.id || (pago as any).pagoId
+        }));
     },
 
     // GET /api/entrenador/{id}/stats
