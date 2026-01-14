@@ -246,8 +246,11 @@ export type EstadoPago = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'PENDIENTE_VER
 
 export interface Pago {
   id: number;
-  cliente: Client;
-  rutina: Routine;
+  pagoId?: number; // Internal ID from backend DTO
+  cliente?: Client;
+  rutina?: Routine;
+  nombreCliente?: string; // New flat field
+  nombreRutina?: string;  // New flat field
   estado: EstadoPago;
   monto: number;
   fechaCreacion: string;
@@ -256,6 +259,8 @@ export interface Pago {
   idExterno: string;
   comprobanteUrl?: string;
   visto: boolean;
+  initPoint?: string;
+  publicKey?: string;
 }
 
 export interface DatosBancarios {

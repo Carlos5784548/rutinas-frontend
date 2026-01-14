@@ -90,11 +90,11 @@ export const PagoDetailModal: React.FC<PagoDetailModalProps> = ({
                             <div className="space-y-4">
                                 <div className="flex justify-between">
                                     <span className="text-default-500">Cliente</span>
-                                    <span className="font-semibold">{pago.cliente?.nombre || 'Cliente'} {pago.cliente?.apellido || 'no encontrado'}</span>
+                                    <span className="font-semibold">{pago.nombreCliente || `${pago.cliente?.nombre || 'Cliente'} ${pago.cliente?.apellido || 'no encontrado'}`}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-default-500">Rutina</span>
-                                    <span className="font-semibold">{pago.rutina?.nombre || 'Rutina no encontrada'}</span>
+                                    <span className="font-semibold">{pago.nombreRutina || pago.rutina?.nombre || 'Rutina no encontrada'}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-default-500">Monto</span>

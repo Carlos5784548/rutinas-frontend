@@ -42,8 +42,7 @@ export const PagoList: React.FC = () => {
         if (filters.search) {
             const search = filters.search.toLowerCase();
             result = result.filter(p =>
-                p.cliente?.nombre?.toLowerCase().includes(search) ||
-                p.cliente?.apellido?.toLowerCase().includes(search)
+                (p.nombreCliente || `${p.cliente?.nombre || ''} ${p.cliente?.apellido || ''}`).toLowerCase().includes(search)
             );
         }
 
@@ -131,13 +130,15 @@ export const PagoList: React.FC = () => {
                                                 <span className="absolute -left-3 top-1 w-2 h-2 bg-primary-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.6)]" title="Nuevo" />
                                             )}
                                             <span className="font-semibold text-default-900">
-                                                {pago.cliente?.nombre || 'Cliente'} {pago.cliente?.apellido || 'no encontrado'}
+                                                {pago.nombreCliente || `${pago.cliente?.nombre || 'Cliente'} ${pago.cliente?.apellido || 'no encontrado'}`}
                                             </span>
-                                            <span className="text-tiny text-default-500">{pago.cliente?.email || 'S/D'}</span>
+                                            {pago.cliente?.email && (
+                                                <span className="text-tiny text-default-500">{pago.cliente.email}</span>
+                                            )}
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="text-default-700 font-medium">{pago.rutina?.nombre || 'Rutina no encontrada'}</span>
+                                        <span className="text-default-700 font-medium">{pago.nombreRutina || pago.rutina?.nombre || 'Rutina no encontrada'}</span>
                                     </TableCell>
                                     <TableCell>
                                         <span className="font-bold text-primary-600">${(pago.monto || 0).toLocaleString()}</span>

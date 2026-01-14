@@ -56,11 +56,11 @@ export const AsignarRutinaModal: React.FC<AsignarRutinaModalProps> = ({
     React.useEffect(() => {
         if (pago) {
             reset({
-                nombre: `Rutina para ${pago.cliente.nombre}`,
+                nombre: `Rutina para ${pago.nombreCliente || pago.cliente?.nombre || 'Cliente'}`,
                 enfoque: 'Tonificar',
                 fechaInicio: new Date().toISOString().split('T')[0],
                 fechaFin: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                clienteId: pago.cliente.id,
+                clienteId: pago.cliente?.id,
                 estado: 'ACTIVA',
                 monto: pago.monto,
                 descripcionDias: ''
@@ -104,7 +104,18 @@ export const AsignarRutinaModal: React.FC<AsignarRutinaModalProps> = ({
         if (!pago) return;
         try {
             setIsSubmitting(true);
-            await pagosApi.asignarRutina(pago.cliente.id!, data);
+            const clienteId = pago.cliente?.id;
+
+            if (!clienteId) {
+                addToast({
+                    title: 'Error',
+                    description: 'No se encontró el ID del cliente para asignar la rutina',
+                    severity: 'danger'
+                });
+                return;
+            }
+
+            await pagosApi.asignarRutina(clienteId, data);
 
             addToast({
                 title: 'Rutina Asignada',
@@ -132,7 +143,7 @@ export const AsignarRutinaModal: React.FC<AsignarRutinaModalProps> = ({
                 {(onClose) => (
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <ModalHeader className="flex flex-col gap-1">
-                            Asignar Rutina a {pago?.cliente.nombre} {pago?.cliente.apellido}
+                            Asignar Rutina a {pago?.nombreCliente || `${pago?.cliente?.nombre || 'Cliente'} ${pago?.cliente?.apellido || ''}`}
                         </ModalHeader>
                         <ModalBody className="gap-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
