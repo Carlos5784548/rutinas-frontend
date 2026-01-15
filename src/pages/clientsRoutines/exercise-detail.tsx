@@ -145,13 +145,30 @@ const ExerciseDetailPage = () => {
 
             <div className="p-4">
                 <div className="max-w-lg mx-auto">
-                    <Card className="mb-6 overflow-hidden">
-                        <CardBody className="p-0">
-                            <div className="relative h-64 bg-primary/10 flex items-center justify-center">
-                                <Icon icon="lucide:dumbbell" className="text-primary/40" width={120} />
-                            </div>
-                        </CardBody>
-                    </Card>
+                    {exercise.videoUrl ? (
+                        <Card className="mb-6">
+                            <CardBody className="p-0 overflow-hidden">
+                                <div className="bg-black flex items-center justify-center min-h-[200px]">
+                                    <MediaRenderer url={exercise.videoUrl} alt={exercise.nombre} />
+                                </div>
+                                <div className="p-3 bg-content1">
+                                    <p className="text-small font-semibold">Demostración</p>
+                                    <a href={exercise.videoUrl} target="_blank" rel="noopener noreferrer" className="text-tiny text-primary hover:underline flex items-center gap-1">
+                                        <Icon icon="lucide:external-link" width={12} />
+                                        Abrir enlace original
+                                    </a>
+                                </div>
+                            </CardBody>
+                        </Card>
+                    ) : (
+                        <Card className="mb-6 overflow-hidden">
+                            <CardBody className="p-0">
+                                <div className="relative h-64 bg-primary/10 flex items-center justify-center">
+                                    <Icon icon="lucide:dumbbell" className="text-primary/40" width={120} />
+                                </div>
+                            </CardBody>
+                        </Card>
+                    )}
 
                     <Card className="mb-6">
                         <CardBody>
@@ -196,22 +213,7 @@ const ExerciseDetailPage = () => {
                         </CardBody>
                     </Card>
 
-                    {exercise.videoUrl && (
-                        <Card className="mb-6">
-                            <CardBody className="p-0 overflow-hidden">
-                                <div className="bg-black flex items-center justify-center min-h-[200px]">
-                                    <MediaRenderer url={exercise.videoUrl} alt={exercise.nombre} />
-                                </div>
-                                <div className="p-3 bg-content1">
-                                    <p className="text-small font-semibold">Demostración</p>
-                                    <a href={exercise.videoUrl} target="_blank" rel="noopener noreferrer" className="text-tiny text-primary hover:underline flex items-center gap-1">
-                                        <Icon icon="lucide:external-link" width={12} />
-                                        Abrir enlace original
-                                    </a>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    )}
+
                 </div>
             </div>
         </PageTransition>

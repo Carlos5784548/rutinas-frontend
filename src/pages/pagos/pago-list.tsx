@@ -12,6 +12,7 @@ import {
     Tooltip
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { toast } from 'sonner';
 import { PageHeader } from '../../components/ui/page-header';
 import { usePagos } from '../../hooks/usePagos';
 import { PagoStatusBadge } from '../../components/pagos/pago-status-badge';
@@ -69,13 +70,19 @@ export const PagoList: React.FC = () => {
         }
     };
 
+
+
+    // ... (existing imports)
+
     const handleShowDetail = (pago: Pago) => {
+        toast.info("Cargando detalles del pago...");
         setSelectedPago(pago);
         onOpen();
         handleMarcarVisto(pago);
     };
 
     const handleShowAssign = (pago: Pago) => {
+        toast.info("Abriendo asignación de rutina...");
         setSelectedPago(pago);
         onAssignOpen();
         handleMarcarVisto(pago);
