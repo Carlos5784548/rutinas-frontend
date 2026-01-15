@@ -11,6 +11,7 @@ import {
     CardBody
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { toast } from 'sonner';
 import { DatosBancarios } from '../../types';
 
 interface TransferPaymentInfoProps {
@@ -103,7 +104,10 @@ export const TransferPaymentInfo: React.FC<TransferPaymentInfoProps> = ({
                         <ModalFooter className="flex flex-col gap-3 pb-8 px-8">
                             <Button
                                 color="primary"
-                                onPress={onConfirm}
+                                onPress={() => {
+                                    toast.success("Ya fue enviada la notificación al entrenador");
+                                    onConfirm();
+                                }}
                                 isLoading={loading}
                                 className="w-full h-14 font-black text-lg shadow-lg shadow-blue-500/20 rounded-xl"
                             >

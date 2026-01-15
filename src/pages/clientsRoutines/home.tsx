@@ -426,8 +426,8 @@ const HomePage = () => {
                                 <CardBody className="p-6">
                                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                                         <div className="space-y-1">
-                                            <h3 className="text-white font-black text-xl">¿Listo para subir de nivel?</h3>
-                                            <p className="text-white/80 font-medium">Contrata un nuevo plan personalizado hoy mismo.</p>
+                                            <h3 className="text-white font-black text-xl">Lleva tu entrenamiento al siguiente nivel</h3>
+                                            <p className="text-white/80 font-medium">Accede a planes profesionales diseñados para tus metas.</p>
                                         </div>
                                         <Button
                                             className="bg-white text-primary font-black px-8 h-12 shadow-lg hover:scale-105 transition-transform"

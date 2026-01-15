@@ -46,8 +46,8 @@ const ExerciseLibraryPage = () => {
         <PageTransition>
             <Header title="Biblioteca de Ejercicios" />
 
-            <div className="p-4 pb-20">
-                <div className="max-w-4xl mx-auto space-y-6">
+            <div className="p-2 md:p-4 pb-20">
+                <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
                     <div className="bg-content1 p-4 rounded-2xl shadow-sm border border-divider space-y-4">
                         <Input
                             placeholder="¿Qué músculo quieres entrenar hoy?"

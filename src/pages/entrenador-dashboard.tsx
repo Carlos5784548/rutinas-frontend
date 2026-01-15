@@ -227,51 +227,82 @@ export const EntrenadorDashboard: React.FC = () => {
                                         </Button>
                                     </div>
                                 ) : (
-                                    <Table
-                                        removeWrapper
-                                        aria-label="Clientes recientes"
-                                        classNames={{
-                                            th: "bg-default-50 text-default-500 text-xs font-semibold uppercase tracking-wider border-b border-default-100",
-                                            td: "py-3 border-b border-default-50 last:border-0"
-                                        }}
-                                    >
-                                        <TableHeader>
-                                            <TableColumn>NOMBRE</TableColumn>
-                                            <TableColumn>EMAIL</TableColumn>
-                                            <TableColumn align="end">ACCIÓN</TableColumn>
-                                        </TableHeader>
-                                        <TableBody>
+                                    <>
+                                        {/* Mobile View */}
+                                        <div className="md:hidden divide-y divide-default-100">
                                             {recentClients.map((client) => (
-                                                <TableRow key={client.id} className="hover:bg-default-50/50 transition-colors">
-                                                    <TableCell>
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-xs font-bold">
-                                                                {client.nombre.charAt(0).toUpperCase()}
-                                                            </div>
-                                                            <Link to={`/clientes/${client.id}`} className="font-medium text-default-900 hover:text-primary-600 transition-colors">
-                                                                {client.nombre} {client.apellido}
-                                                            </Link>
+                                                <div key={client.id} className="p-4 flex items-center justify-between hover:bg-default-50/50 transition-colors">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
+                                                            {client.nombre.charAt(0).toUpperCase()}
                                                         </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <span className="text-default-500 text-sm">{client.email}</span>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="light"
-                                                            as={Link}
-                                                            to={`/clientes/${client.id}`}
-                                                            className="text-default-400 hover:text-primary-500"
-                                                        >
-                                                            <Icon icon="lucide:chevron-right" width={18} />
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
+                                                        <Link to={`/clientes/${client.id}`} className="block">
+                                                            <p className="font-semibold text-default-900">{client.nombre} {client.apellido}</p>
+                                                            <p className="text-tiny text-default-500">{client.email}</p>
+                                                        </Link>
+                                                    </div>
+                                                    <Button
+                                                        isIconOnly
+                                                        size="sm"
+                                                        variant="light"
+                                                        as={Link}
+                                                        to={`/clientes/${client.id}`}
+                                                        className="text-default-400"
+                                                    >
+                                                        <Icon icon="lucide:chevron-right" width={20} />
+                                                    </Button>
+                                                </div>
                                             ))}
-                                        </TableBody>
-                                    </Table>
+                                        </div>
+
+                                        {/* Desktop View */}
+                                        <Table
+                                            removeWrapper
+                                            aria-label="Clientes recientes"
+                                            classNames={{
+                                                base: "hidden md:flex",
+                                                th: "bg-default-50 text-default-500 text-xs font-semibold uppercase tracking-wider border-b border-default-100",
+                                                td: "py-3 border-b border-default-50 last:border-0"
+                                            }}
+                                        >
+                                            <TableHeader>
+                                                <TableColumn>NOMBRE</TableColumn>
+                                                <TableColumn>EMAIL</TableColumn>
+                                                <TableColumn align="end">ACCIÓN</TableColumn>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {recentClients.map((client) => (
+                                                    <TableRow key={client.id} className="hover:bg-default-50/50 transition-colors">
+                                                        <TableCell>
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-xs font-bold">
+                                                                    {client.nombre.charAt(0).toUpperCase()}
+                                                                </div>
+                                                                <Link to={`/clientes/${client.id}`} className="font-medium text-default-900 hover:text-primary-600 transition-colors">
+                                                                    {client.nombre} {client.apellido}
+                                                                </Link>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <span className="text-default-500 text-sm">{client.email}</span>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button
+                                                                isIconOnly
+                                                                size="sm"
+                                                                variant="light"
+                                                                as={Link}
+                                                                to={`/clientes/${client.id}`}
+                                                                className="text-default-400 hover:text-primary-500"
+                                                            >
+                                                                <Icon icon="lucide:chevron-right" width={18} />
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </>
                                 )}
                             </CardBody>
                         </Card>

@@ -105,83 +105,137 @@ export const PagoList: React.FC = () => {
                         <p className="text-default-500 font-medium animate-pulse">Cargando pagos...</p>
                     </div>
                 ) : (
-                    <Table
-                        aria-label="Tabla de pagos"
-                        removeWrapper
-                        classNames={{
-                            th: "bg-default-50 text-default-600 font-bold uppercase py-4 border-b border-default-100",
-                            td: "py-4 border-b border-default-50 last:border-0"
-                        }}
-                    >
-                        <TableHeader>
-                            <TableColumn>CLIENTE</TableColumn>
-                            <TableColumn>RUTINA</TableColumn>
-                            <TableColumn>MONTO</TableColumn>
-                            <TableColumn>ESTADO</TableColumn>
-                            <TableColumn>FECHA</TableColumn>
-                            <TableColumn align="end">ACCIONES</TableColumn>
-                        </TableHeader>
-                        <TableBody emptyContent="No se encontraron pagos con los filtros seleccionados">
+                    <>
+                        {/* Mobile View */}
+                        <div className="md:hidden space-y-4 p-4 bg-default-50">
                             {filteredPagos.map((pago) => (
-                                <TableRow key={pago.id} className="hover:bg-default-50/50 transition-colors">
-                                    <TableCell>
-                                        <div className="flex flex-col relative">
-                                            {!pago.visto && (
-                                                <span className="absolute -left-3 top-1 w-2 h-2 bg-primary-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.6)]" title="Nuevo" />
-                                            )}
-                                            <span className="font-semibold text-default-900">
-                                                {pago.nombreCliente || `${pago.cliente?.nombre || 'Cliente'} ${pago.cliente?.apellido || 'no encontrado'}`}
+                                <div key={pago.id} className="bg-background rounded-2xl p-4 shadow-sm border border-default-200">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-default-900 text-lg">
+                                                {pago.nombreCliente || `${pago.cliente?.nombre} ${pago.cliente?.apellido}`}
                                             </span>
-                                            {pago.cliente?.email && (
-                                                <span className="text-tiny text-default-500">{pago.cliente.email}</span>
-                                            )}
+                                            <span className="text-tiny text-default-500">{formatDate(pago.fechaCreacion)}</span>
                                         </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="text-default-700 font-medium">{pago.nombreRutina || pago.rutina?.nombre || 'Rutina no encontrada'}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="font-bold text-primary-600">${(pago.monto || 0).toLocaleString()}</span>
-                                    </TableCell>
-                                    <TableCell>
                                         <PagoStatusBadge status={pago.estado} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="text-default-500 text-small">{formatDate(pago.fechaCreacion)}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center justify-end gap-2">
-                                            <Tooltip content="Ver detalles">
-                                                <Button
-                                                    isIconOnly
-                                                    size="sm"
-                                                    variant="flat"
-                                                    onPress={() => handleShowDetail(pago)}
-                                                    className="bg-default-100 text-default-600"
-                                                >
-                                                    <Icon icon="lucide:eye" width={18} />
-                                                </Button>
-                                            </Tooltip>
+                                    </div>
 
-                                            {pago.estado === 'APROBADO' && (
-                                                <Tooltip content="Asignar Rutina" color="primary">
+                                    <div className="flex justify-between items-center py-2 border-y border-dashed border-default-100 mb-3">
+                                        <span className="text-small text-default-500">Monto</span>
+                                        <span className="font-black text-xl text-primary">${(pago.monto || 0).toLocaleString()}</span>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <span className="text-tiny text-default-400 uppercase font-bold">Rutina</span>
+                                        <p className="text-small font-semibold text-default-700">{pago.nombreRutina || pago.rutina?.nombre || 'Rutina no encontrada'}</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Button
+                                            size="sm"
+                                            variant="flat"
+                                            className="w-full"
+                                            onPress={() => handleShowDetail(pago)}
+                                            startContent={<Icon icon="lucide:eye" />}
+                                        >
+                                            Ver detalle
+                                        </Button>
+                                        {pago.estado === 'APROBADO' && (
+                                            <Button
+                                                size="sm"
+                                                color="primary"
+                                                className="w-full"
+                                                onPress={() => handleShowAssign(pago)}
+                                                startContent={<Icon icon="lucide:clipboard-list" />}
+                                            >
+                                                Asignar
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Desktop View */}
+                        <Table
+                            aria-label="Tabla de pagos"
+                            removeWrapper
+                            classNames={{
+                                base: "hidden md:flex",
+                                th: "bg-default-50 text-default-600 font-bold uppercase py-4 border-b border-default-100",
+                                td: "py-4 border-b border-default-50 last:border-0"
+                            }}
+                        >
+                            <TableHeader>
+                                <TableColumn>CLIENTE</TableColumn>
+                                <TableColumn>RUTINA</TableColumn>
+                                <TableColumn>MONTO</TableColumn>
+                                <TableColumn>ESTADO</TableColumn>
+                                <TableColumn>FECHA</TableColumn>
+                                <TableColumn align="end">ACCIONES</TableColumn>
+                            </TableHeader>
+                            <TableBody emptyContent="No se encontraron pagos con los filtros seleccionados">
+                                {filteredPagos.map((pago) => (
+                                    <TableRow key={pago.id} className="hover:bg-default-50/50 transition-colors">
+                                        <TableCell>
+                                            <div className="flex flex-col relative">
+                                                {!pago.visto && (
+                                                    <span className="absolute -left-3 top-1 w-2 h-2 bg-primary-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.6)]" title="Nuevo" />
+                                                )}
+                                                <span className="font-semibold text-default-900">
+                                                    {pago.nombreCliente || `${pago.cliente?.nombre || 'Cliente'} ${pago.cliente?.apellido || 'no encontrado'}`}
+                                                </span>
+                                                {pago.cliente?.email && (
+                                                    <span className="text-tiny text-default-500">{pago.cliente.email}</span>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-default-700 font-medium">{pago.nombreRutina || pago.rutina?.nombre || 'Rutina no encontrada'}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="font-bold text-primary-600">${(pago.monto || 0).toLocaleString()}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <PagoStatusBadge status={pago.estado} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-default-500 text-small">{formatDate(pago.fechaCreacion)}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Tooltip content="Ver detalles">
                                                     <Button
                                                         isIconOnly
                                                         size="sm"
-                                                        color="primary"
                                                         variant="flat"
-                                                        onPress={() => handleShowAssign(pago)}
+                                                        onPress={() => handleShowDetail(pago)}
+                                                        className="bg-default-100 text-default-600"
                                                     >
-                                                        <Icon icon="lucide:clipboard-list" width={18} />
+                                                        <Icon icon="lucide:eye" width={18} />
                                                     </Button>
                                                 </Tooltip>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+
+                                                {pago.estado === 'APROBADO' && (
+                                                    <Tooltip content="Asignar Rutina" color="primary">
+                                                        <Button
+                                                            isIconOnly
+                                                            size="sm"
+                                                            color="primary"
+                                                            variant="flat"
+                                                            onPress={() => handleShowAssign(pago)}
+                                                        >
+                                                            <Icon icon="lucide:clipboard-list" width={18} />
+                                                        </Button>
+                                                    </Tooltip>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </>
                 )}
             </div>
 
