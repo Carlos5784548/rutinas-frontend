@@ -92,8 +92,11 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4">
-      <div className="w-full max-w-[400px] bg-white rounded-2xl shadow-xl shadow-black/5 border border-black/5 p-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 relative bg-[url('/login-bg.jpg')] bg-cover bg-center bg-no-repeat bg-fixed">
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-0" />
+
+      <div className="w-full max-w-[400px] bg-white rounded-2xl shadow-xl shadow-black/20 border border-white/20 p-8 relative overflow-hidden z-10">
 
         {/* Subtle top decoration */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 to-secondary/80" />
