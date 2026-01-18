@@ -152,19 +152,39 @@ export const clientApi = {
   getAll: async (trainerId?: number): Promise<Client[]> => {
     if (trainerId === undefined || trainerId === null) {
       console.warn('clientApi.getAll called without trainerId. Falling back to /clientes if possible or providing empty list.');
-      // If there's a generic "all clients" endpoint, we could use it, 
-      // but based on the provided endpoints, we usually need a trainer context.
-      // For now, let's try to fetch from /clientes if it exists, or just return empty.
       try {
-        const response: AxiosResponse<Client[]> = await api.get('/clientes');
+        const response = await api.get('/clientes', { params: { size: 1000 } });
+        // Handle Page response if /clientes is also paginated (likely)
+        if (response.data && response.data.content) {
+          return response.data.content;
+        }
         return response.data;
       } catch (e) {
         console.error('Failed to fetch from /clientes as fallback:', e);
         return [];
       }
     }
-    const response: AxiosResponse<Client[]> = await api.get(`/entrenadores/${trainerId}/clientes`);
+    // Fetch with large size to emulate "all" for existing list views until they are paginated
+    const response = await api.get(`/entrenadores/${trainerId}/clientes`, { params: { size: 1000 } });
+    if (response.data && response.data.content) {
+      return response.data.content;
+    }
     return response.data;
+  },
+
+  getRecent: async (trainerId: number): Promise<Client[]> => {
+    // Optimized fetch for dashboard: only 5 recent clients
+    const response = await api.get(`/entrenadores/${trainerId}/clientes`, {
+      params: {
+        page: 0,
+        size: 5,
+        sort: 'id,desc'
+      }
+    });
+    if (response.data && response.data.content) {
+      return response.data.content;
+    }
+    return Array.isArray(response.data) ? response.data.slice(0, 5) : [];
   },
 
   getById: async (id: number): Promise<Client> => {
@@ -366,9 +386,22 @@ export const routineApi = {
 
 export const exerciseApi = {
   getAll: async (filter?: ExerciseFilter): Promise<Exercise[]> => {
-    const params = filter ? { ...filter } : {};
-    const response: AxiosResponse<Exercise[]> = await api.get('/ejercicios', { params });
+    const params = filter ? { ...filter, size: 1000 } : { size: 1000 };
+    const response = await api.get('/ejercicios', { params });
+    if (response.data && response.data.content) {
+      return response.data.content;
+    }
     return response.data;
+  },
+
+  getCount: async (): Promise<number> => {
+    // Optimized fetch: size=1 just to get totalElements
+    const response = await api.get('/ejercicios', { params: { size: 1 } });
+    if (response.data && typeof response.data.totalElements === 'number') {
+      return response.data.totalElements;
+    }
+    // Fallback if not paginated
+    return Array.isArray(response.data) ? response.data.length : 0;
   },
 
   getById: async (id: number): Promise<Exercise> => {

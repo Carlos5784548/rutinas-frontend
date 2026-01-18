@@ -3,7 +3,7 @@ import { Card, CardBody, CardHeader, Spinner, Table, TableHeader, TableColumn, T
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/ui/page-header';
-import { trainerApi, routineApi, exerciseApi, getEntrenadorId } from '../services/api';
+import { trainerApi, routineApi, exerciseApi, clientApi, getEntrenadorId } from '../services/api';
 import { Client } from '../types';
 import { usePagoStats } from '../hooks/usePagoStats';
 
@@ -24,22 +24,25 @@ export const EntrenadorDashboard: React.FC = () => {
 
             try {
                 setLoading(true);
-                const [clients, routines, exercises] = await Promise.all([
-                    trainerApi.getMyClients(entrenadorId),
-                    routineApi.getAll(),
-                    exerciseApi.getAll()
+                // Optimized: fetch recent clients directly and exercise count
+                const [recentClientsData, exerciseCount] = await Promise.all([
+                    clientApi.getRecent(entrenadorId),
+                    exerciseApi.getCount()
                 ]);
 
                 setStats({
-                    clients: clients.length,
-                    routines: routines.length,
-                    exercises: exercises.length
+                    clients: 0, // Not used in UI (comes from paymentStats)
+                    routines: 0, // Not used in UI (comes from paymentStats)
+                    exercises: exerciseCount
                 });
 
-                // Get most recent clients (last 5)
-                setRecentClients(clients.slice(-5).reverse());
+                setRecentClients(recentClientsData);
             } catch (error) {
                 console.error('Error fetching trainer dashboard stats:', error);
+
+                // Fallback for safety if API fails
+                setStats(prev => ({ ...prev, exercises: 0 }));
+                setRecentClients([]);
             } finally {
                 setLoading(false);
             }
