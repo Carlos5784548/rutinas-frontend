@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Card, CardBody, Progress, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { PageTransition } from '../../components/clientes-components/page-transition';
-import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 import { clientApi, getClienteId, decodeToken, authApi } from '../../services/api';
 import { RutinaResponseDTO, ProgresoEjercicioResponseDTO, RutinaEjercicioResponseDTO, RutinaResumenResponseDTO } from '../../types';
 import { Header } from '../../components/clientes-components/header';
@@ -339,8 +339,9 @@ const HomePage = () => {
                                 <h3 className="text-lg font-bold mb-6">Tendencia de Fuerza</h3>
                                 <div className="h-48">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart
+                                        <BarChart
                                             data={chartData.length > 0 ? chartData : [{ date: '...', peso: 0 }]}
+                                            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                                         >
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--heroui-divider)" />
                                             <XAxis
@@ -348,9 +349,15 @@ const HomePage = () => {
                                                 tick={{ fontSize: 10, fill: 'var(--heroui-foreground-400)' }}
                                                 axisLine={false}
                                                 tickLine={false}
+                                                dy={10}
                                             />
-                                            <YAxis hide />
+                                            <YAxis
+                                                tick={{ fontSize: 10, fill: 'var(--heroui-foreground-400)' }}
+                                                axisLine={false}
+                                                tickLine={false}
+                                            />
                                             <Tooltip
+                                                cursor={{ fill: 'var(--heroui-content2)', opacity: 0.5 }}
                                                 contentStyle={{
                                                     backgroundColor: 'var(--heroui-content1)',
                                                     border: '1px solid var(--heroui-divider)',
@@ -358,15 +365,13 @@ const HomePage = () => {
                                                     boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
                                                 }}
                                             />
-                                            <Line
-                                                type="monotone"
+                                            <Bar
                                                 dataKey="peso"
-                                                stroke="var(--heroui-primary)"
-                                                strokeWidth={3}
-                                                dot={{ fill: 'var(--heroui-primary)', strokeWidth: 0, r: 4 }}
-                                                activeDot={{ r: 6, stroke: 'var(--heroui-background)', strokeWidth: 2 }}
+                                                fill="var(--heroui-primary)"
+                                                radius={[6, 6, 6, 6]}
+                                                barSize={32}
                                             />
-                                        </LineChart>
+                                        </BarChart>
                                     </ResponsiveContainer>
                                 </div>
                                 <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-divider">

@@ -164,22 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           <Divider />
 
           <div className="p-4 space-y-3 shrink-0">
-            {isOpen && userInfo && (
-              <div className="px-2 py-2 bg-default-100 rounded-lg whitespace-nowrap overflow-hidden">
-                <User
-                  name={userInfo.name}
-                  description={userInfo.role}
-                  avatarProps={{
-                    name: userInfo.name.charAt(0).toUpperCase(),
-                    className: "bg-primary text-white"
-                  }}
-                  classNames={{
-                    name: "text-sm font-medium",
-                    description: "text-xs text-default-500"
-                  }}
-                />
-              </div>
-            )}
+
 
             <Button
               variant="flat"

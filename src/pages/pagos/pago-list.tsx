@@ -33,14 +33,16 @@ export const PagoList: React.FC = () => {
         setFilteredPagos(pagos);
     }, [pagos]);
 
-    const handleFilterChange = (filters: { estado?: string; search: string; dateRange: { start: string; end: string } }) => {
+    const handleFilterChange = (filters: { estado?: string; search: string; clientId?: number; dateRange: { start: string; end: string } }) => {
         let result = [...pagos];
 
         if (filters.estado) {
             result = result.filter(p => p.estado === filters.estado);
         }
 
-        if (filters.search) {
+        if (filters.clientId) {
+            result = result.filter(p => p.cliente?.id === filters.clientId);
+        } else if (filters.search) {
             const search = filters.search.toLowerCase();
             result = result.filter(p =>
                 (p.nombreCliente || `${p.cliente?.nombre || ''} ${p.cliente?.apellido || ''}`).toLowerCase().includes(search)
