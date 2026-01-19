@@ -243,31 +243,67 @@ const RoutineDetailPage = () => {
                         </div>
 
                         <div className="space-y-3">
-                            {dailyExercises
-                                .sort((a, b) => {
+                            {(() => {
+                                const sortedExercises = [...dailyExercises].sort((a, b) => {
                                     const groupA = a.esBiSerie ? (a.biSerieGrupo || 0) : 999;
                                     const groupB = b.esBiSerie ? (b.biSerieGrupo || 0) : 999;
                                     if (groupA !== groupB) return groupA - groupB;
                                     return (a.id || 0) - (b.id || 0);
-                                })
-                                .map((exercise, index, array) => {
-                                    const prevExercise = array[index - 1];
-                                    const nextExercise = array[index + 1];
-                                    const isFirstInGroup = exercise.esBiSerie && (!prevExercise || !prevExercise.esBiSerie || prevExercise.biSerieGrupo !== exercise.biSerieGrupo);
-                                    const isLastInGroup = !exercise.esBiSerie ||
-                                        !nextExercise ||
-                                        !nextExercise.esBiSerie ||
-                                        nextExercise.biSerieGrupo !== exercise.biSerieGrupo;
+                                });
 
-                                    return (
-                                        <React.Fragment key={exercise.id}>
-                                            {isFirstInGroup && (
-                                                <div className="flex items-center gap-2 mb-1 ml-1 mt-2">
-                                                    <Icon icon="mdi:link-variant" className="text-primary" width={14} />
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Bi-serie Grupo {exercise.biSerieGrupo}</span>
+                                const groupedExercises: { isBiSerie: boolean; biSerieGrupo?: number; exercises: RutinaEjercicioResponseDTO[] }[] = [];
+
+                                sortedExercises.forEach(ex => {
+                                    const lastGroup = groupedExercises[groupedExercises.length - 1];
+                                    const isBiSerie = ex.esBiSerie;
+                                    const biSerieGrupo = ex.biSerieGrupo;
+
+                                    if (lastGroup && lastGroup.isBiSerie && isBiSerie && lastGroup.biSerieGrupo === biSerieGrupo) {
+                                        lastGroup.exercises.push(ex);
+                                    } else {
+                                        groupedExercises.push({
+                                            isBiSerie: !!isBiSerie,
+                                            biSerieGrupo: biSerieGrupo || undefined,
+                                            exercises: [ex]
+                                        });
+                                    }
+                                });
+
+                                return groupedExercises.map((group, groupIndex) => {
+                                    if (group.isBiSerie) {
+                                        return (
+                                            <div key={`group-${group.biSerieGrupo}-${groupIndex}`} className="mb-4 p-3 sm:p-4 border border-primary/20 bg-primary/5 rounded-2xl relative overflow-hidden">
+                                                <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                                                <div className="flex items-center gap-2 mb-3 ml-1">
+                                                    <Icon icon="mdi:link-variant" className="text-primary" width={18} />
+                                                    <span className="text-xs font-black uppercase tracking-widest text-primary">Bi-serie Grupo {group.biSerieGrupo}</span>
                                                 </div>
-                                            )}
+                                                <div className="flex flex-col gap-3">
+                                                    {group.exercises.map((exercise, index) => (
+                                                        <ExerciseCard
+                                                            key={exercise.id}
+                                                            exercise={{
+                                                                id: exercise.ejercicioId.toString(),
+                                                                name: exercise.ejercicioNombre,
+                                                                sets: exercise.series,
+                                                                reps: exercise.repeticiones.toString(),
+                                                                rest: exercise.descansoSegundos.toString() + 's',
+                                                                image: exercisesMap[exercise.ejercicioId]?.videoUrl || "https://images.unsplash.com/photo-1534438327245-0451796ceb5d?w=200",
+                                                                muscleGroup: "Varios",
+                                                                esBiSerie: exercise.esBiSerie,
+                                                                biSerieGrupo: exercise.biSerieGrupo
+                                                            }}
+                                                            index={index}
+                                                            isLastInGroup={index === group.exercises.length - 1}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    } else {
+                                        return group.exercises.map((exercise, index) => (
                                             <ExerciseCard
+                                                key={exercise.id}
                                                 exercise={{
                                                     id: exercise.ejercicioId.toString(),
                                                     name: exercise.ejercicioNombre,
@@ -280,11 +316,12 @@ const RoutineDetailPage = () => {
                                                     biSerieGrupo: exercise.biSerieGrupo
                                                 }}
                                                 index={index}
-                                                isLastInGroup={isLastInGroup}
+                                                isLastInGroup={true}
                                             />
-                                        </React.Fragment>
-                                    );
-                                })}
+                                        ));
+                                    }
+                                });
+                            })()}
 
                             {dailyExercises.length === 0 && (
                                 <div className="text-center py-8">

@@ -141,14 +141,23 @@ const TrainingModePage = () => {
             const newCompletedSets = { ...completedSets, [currentExercise.id]: currentSets + 1 };
             setCompletedSets(newCompletedSets);
 
+            const shouldRest = (currentExercise.descansoSegundos || 0) > 5;
+
             if (newCompletedSets[currentExercise.id] >= currentExercise.series) {
                 if (currentExerciseIndex < totalExercises - 1) {
-                    setShowRest(true);
+                    if (shouldRest) {
+                        setShowRest(true);
+                    } else {
+                        // Skip rest and go to next exercise
+                        setCurrentExerciseIndex(prev => prev + 1);
+                    }
                 } else {
                     setIsCompleted(true);
                 }
             } else {
-                setShowRest(true);
+                if (shouldRest) {
+                    setShowRest(true);
+                }
             }
         } catch (error) {
             console.error("Error registering progress:", error);
