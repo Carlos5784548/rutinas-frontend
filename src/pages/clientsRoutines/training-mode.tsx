@@ -36,13 +36,15 @@ const TrainingModePage = () => {
                     clientApi.getMyProgress(clienteId)
                 ]);
 
+                const exercisesList = Array.isArray(exercisesData) ? exercisesData : [];
                 // Filtrar por el día seleccionado
-                const dayExercises = exercisesData.filter(e => e.dia === parseInt(dayId));
+                const dayExercises = exercisesList.filter(e => e.dia === parseInt(dayId));
                 setExercises(dayExercises);
 
                 // --- Reconstrucción del Estado Senior ---
                 const today = new Date().toISOString().split('T')[0];
-                const todayProgress = allProgress.filter(p => p.fecha === today);
+                const progressList = Array.isArray(allProgress) ? allProgress : [];
+                const todayProgress = progressList.filter(p => p.fecha === today);
 
                 const newCompletedSets: Record<number, number> = {};
                 const newWeights: Record<number, Record<number, number>> = {};

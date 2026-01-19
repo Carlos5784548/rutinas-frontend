@@ -51,9 +51,12 @@ const RoutineDetailPage = () => {
                 });
                 setExercisesMap(exMap);
 
-                const foundRoutine = allRoutines.find(r => r.id === parseInt(id));
+                const routinesList = Array.isArray(allRoutines) ? allRoutines : [];
+                const foundRoutine = routinesList.find((r: RutinaResponseDTO) => r.id === parseInt(id));
                 setRoutine(foundRoutine || null);
-                setExercises(exercisesData);
+
+                const exercisesList = Array.isArray(exercisesData) ? exercisesData : [];
+                setExercises(exercisesList);
 
                 const availableDays = [...new Set(exercisesData.map(e => e.dia))].sort((a, b) => a - b);
                 if (availableDays.length > 0) {
