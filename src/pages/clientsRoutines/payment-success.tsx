@@ -41,9 +41,10 @@ const PaymentSuccessPage = () => {
                     const routines = await clientApi.getMyRoutines(clienteId);
 
                     // Si tenemos routineId, buscamos esa específicamente
+                    const routinesList = Array.isArray(routines) ? routines : [];
                     const targetRoutine = routineId
-                        ? routines.find(r => r.id === routineId)
-                        : routines.find(r => r.estado === 'ACTIVA'); // Fallback: buscar la más reciente activa
+                        ? routinesList.find((r: any) => r.id === routineId)
+                        : routinesList.find((r: any) => r.estado === 'ACTIVA'); // Fallback: buscar la más reciente activa
 
                     if (targetRoutine && targetRoutine.estado === 'ACTIVA') {
                         setStatus('success');

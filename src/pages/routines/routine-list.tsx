@@ -153,7 +153,8 @@ export const RoutineList: React.FC = () => {
   };
 
   const getClientName = (clienteId: number) => {
-    const client = clients.find(c => c.id === clienteId);
+    const clientsList = Array.isArray(clients) ? clients : [];
+    const client = clientsList.find(c => c.id === clienteId);
     return client ? client.nombre : 'Cliente no encontrado';
   };
 

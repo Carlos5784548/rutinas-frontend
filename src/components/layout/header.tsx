@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const tokenData = decodeToken();
   const userName = tokenData?.nombre || tokenData?.sub || 'Usuario';
   const { pagos, refresh } = usePagos();
-  const unreadPagos = React.useMemo(() => pagos.filter(p => !p.visto), [pagos]);
+  const unreadPagos = React.useMemo(() => (Array.isArray(pagos) ? pagos : []).filter(p => !p.visto), [pagos]);
 
   const unreadCount = React.useMemo(() => {
     if (role === 'CLIENTE') return 0;
@@ -102,7 +102,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               onAction={(key) => {
                 if (key === 'view-all') handleAction(key);
                 else {
-                  const pago = unreadPagos.find(p => p.id === Number(key));
+                  const pagosList = Array.isArray(unreadPagos) ? unreadPagos : [];
+                  const pago = pagosList.find(p => p.id === Number(key));
                   if (pago) handleNotificationClick(pago);
                 }
               }}
