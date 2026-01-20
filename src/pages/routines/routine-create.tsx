@@ -296,7 +296,7 @@ export const RoutineCreate: React.FC = () => {
         control={control}
         rules={{ required: 'El cliente es obligatorio' }}
         render={({ field }) => {
-          const selectedClient = clients.find(c => c.id === field.value);
+          const selectedClient = (clients || []).find(c => c.id === field.value);
           return (
             <Select
               label="Cliente"
@@ -318,8 +318,8 @@ export const RoutineCreate: React.FC = () => {
               isInvalid={!!errors.clienteId}
               errorMessage={errors.clienteId?.message}
             >
-              {clients
-                .filter(client => client.id !== undefined)
+              {(clients || [])
+                .filter(client => client?.id !== undefined)
                 .map((client) => (
                   <SelectItem key={String(client.id)}>
                     {client.nombre} {client.apellido || ''}

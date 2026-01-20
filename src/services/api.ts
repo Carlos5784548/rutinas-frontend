@@ -124,7 +124,10 @@ api.interceptors.response.use(
 export const userApi = {
   getAll: async (filter?: UserFilter): Promise<User[]> => {
     const params = filter ? { ...filter } : {};
-    const response: AxiosResponse<User[]> = await api.get('/usuarios', { params });
+    const response = await api.get('/usuarios', { params });
+    if (response.data && (response.data as any).content) {
+      return (response.data as any).content;
+    }
     return response.data;
   },
 
@@ -214,13 +217,19 @@ export const clientApi = {
   },
 
   getRoutines: async (id: number): Promise<Routine[]> => {
-    const response: AxiosResponse<Routine[]> = await api.get(`/clientes/${id}/rutinas`);
+    const response = await api.get(`/clientes/${id}/rutinas`);
+    if (response.data && (response.data as any).content) {
+      return (response.data as any).content;
+    }
     return response.data;
   },
 
   // New methods based on user provided endpoints
   getMyRoutines: async (clienteId: number): Promise<RutinaResponseDTO[]> => {
-    const response: AxiosResponse<RutinaResponseDTO[]> = await api.get(`/clientes/${clienteId}/mis-rutinas`);
+    const response = await api.get(`/clientes/${clienteId}/mis-rutinas`);
+    if (response.data && (response.data as any).content) {
+      return (response.data as any).content;
+    }
     return response.data;
   },
 
@@ -278,7 +287,10 @@ export const trainerApi = {
 
   // List all clients for a specific trainer
   getMyClients: async (trainerId: number): Promise<Client[]> => {
-    const response: AxiosResponse<Client[]> = await api.get(`/entrenadores/${trainerId}/clientes`);
+    const response = await api.get(`/entrenadores/${trainerId}/clientes`);
+    if (response.data && (response.data as any).content) {
+      return (response.data as any).content;
+    }
     return response.data;
   },
 
@@ -334,8 +346,11 @@ export const adminApi = {
 
 export const routineApi = {
   getAll: async (filter?: RoutineFilter): Promise<Routine[]> => {
-    const params = filter ? { ...filter } : {};
-    const response: AxiosResponse<Routine[]> = await api.get('/rutinas', { params });
+    const params = filter ? { ...filter, size: 1000 } : { size: 1000 };
+    const response = await api.get('/rutinas', { params });
+    if (response.data && (response.data as any).content) {
+      return (response.data as any).content;
+    }
     return response.data;
   },
 

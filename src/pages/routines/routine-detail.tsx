@@ -68,7 +68,7 @@ const getExerciseName = (ejercicioNombre?: string) => {
 const getDayName = (day: number, descripcionDias?: string): string => {
   if (descripcionDias) {
     const parts = descripcionDias.split(';');
-    const dayPart = parts.find(p => p.startsWith(`${day}:`));
+    const dayPart = (parts || []).find(p => p.startsWith(`${day}:`));
     if (dayPart) {
       const customName = dayPart.split(':')[1];
       return `Día ${day} - ${customName}`;
@@ -245,7 +245,7 @@ export const RoutineDetail: React.FC = () => {
         descansoSegundos: Number(data.descansoSegundos),
         dia: Number(data.dia),
         ejercicioId: Number(data.ejercicioId),
-        orden: editingExercise ? editingExercise.orden : routineExercises.filter(ex => ex.dia === Number(data.dia)).length
+        orden: editingExercise ? editingExercise.orden : (routineExercises || []).filter(ex => ex.dia === Number(data.dia)).length
       };
 
       if (editingExercise) {
@@ -275,7 +275,7 @@ export const RoutineDetail: React.FC = () => {
   const handleMoveExercise = React.useCallback(async (direction: 'up' | 'down', currentEx: RoutineExercise, dayExercises: RoutineExercise[]) => {
     if (!id) return;
     const routineId = parseInt(id);
-    const currentIndex = dayExercises.findIndex(ex => ex.id === currentEx.id);
+    const currentIndex = (dayExercises || []).findIndex(ex => ex.id === currentEx.id);
     const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
     if (targetIndex < 0 || targetIndex >= dayExercises.length) return;
@@ -387,7 +387,7 @@ export const RoutineDetail: React.FC = () => {
                           isInvalid={!!errors.ejercicioId}
                           errorMessage={errors.ejercicioId?.message}
                         >
-                          {exercises.map((exercise) => (
+                          {(exercises || []).map((exercise) => (
                             <SelectItem
                               key={exercise.id?.toString()}
                               textValue={`${exercise.nombre} - ${exercise.grupoMuscular}`}
@@ -563,7 +563,7 @@ export const RoutineDetail: React.FC = () => {
     try {
       setIsDeleting(true);
       await routineApi.removeExercise(parseInt(id), exerciseToDelete.id);
-      setRoutineExercises(routineExercises.filter(ex => ex.id !== exerciseToDelete.id));
+      setRoutineExercises((routineExercises || []).filter(ex => ex.id !== exerciseToDelete.id));
       addToast({
         title: 'Ejercicio eliminado',
         description: 'El ejercicio ha sido eliminado de la rutina correctamente',
@@ -599,7 +599,7 @@ export const RoutineDetail: React.FC = () => {
     }
 
     // Fill groups with existing exercises
-    routineExercises.forEach((ex) => {
+    (routineExercises || []).forEach((ex) => {
       const day = ex.dia || 1;
       if (!groups[day]) groups[day] = [];
       groups[day].push(ex);

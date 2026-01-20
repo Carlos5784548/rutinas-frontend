@@ -71,7 +71,7 @@ export const RoutineList: React.FC = () => {
       setLoading(true);
       setError(null);
       const data = await routineApi.getAll();
-      setRoutines(data.filter(r => r.estado !== 'CANCELADA'));
+      setRoutines((data || []).filter(r => r.estado !== 'CANCELADA'));
     } catch (error) {
       console.error('Error fetching routines:', error);
       setError(error);
@@ -226,7 +226,7 @@ export const RoutineList: React.FC = () => {
             }}
             className="sm:max-w-xs"
           >
-            {clients.map((client) => (
+            {(clients || []).map((client) => (
               <SelectItem key={client.id?.toString()}>
                 {client.nombre}
               </SelectItem>
