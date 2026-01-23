@@ -358,8 +358,9 @@ export const AdminDashboard: React.FC = () => {
                                                 placeholder="30"
                                                 isInvalid={!!fieldState.error}
                                                 errorMessage={fieldState.error?.message}
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                                value={field.value?.toString() || ''}
+                                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                                onBlur={field.onBlur}
                                             />
                                         )}
                                     />

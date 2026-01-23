@@ -1,1 +1,9 @@
 node_modules
+dist/
+*.log
+*.zip
+.env
+lint_final.txt
+lint_output.txt
+tsc_errors.txt
+tsc_output_*.txt

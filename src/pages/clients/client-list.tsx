@@ -70,7 +70,7 @@ export const ClientList: React.FC = () => {
       if (isTrainerUser && entrenadorId) {
         data = await trainerApi.getMyClients(entrenadorId);
       } else {
-        data = await clientApi.getAll(entrenadorId);
+        data = await clientApi.getAll(entrenadorId || undefined);
       }
       setClients(data);
     } catch (error) {
@@ -144,7 +144,7 @@ export const ClientList: React.FC = () => {
           <Input
             placeholder="Buscar por nombre, email o teléfono..."
             startContent={<Icon icon="lucide:search" className="h-4 w-4 text-default-400" />}
-            value={searchQuery}
+            value={searchQuery || ''}
             onValueChange={handleSearchChange}
             className="sm:max-w-xs"
           />

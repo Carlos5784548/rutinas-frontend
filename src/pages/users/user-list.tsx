@@ -1,16 +1,16 @@
 import React from 'react';
-import { 
-  Table, 
-  TableHeader, 
-  TableColumn, 
-  TableBody, 
-  TableRow, 
-  TableCell, 
-  Chip, 
-  Button, 
-  Dropdown, 
-  DropdownTrigger, 
-  DropdownMenu, 
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Chip,
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
   DropdownItem,
   Input,
   Select,
@@ -24,7 +24,7 @@ import { PageHeader } from '../../components/ui/page-header';
 import { EmptyState } from '../../components/ui/empty-state';
 import { ConfirmationModal } from '../../components/ui/confirmation-modal';
 import { clientApi } from '../../services/api';
-import { Client } from '../../types';
+import { Client, UserFilter, User } from '../../types';
 import { addToast } from '@heroui/react';
 import { ErrorAlert } from '../../components/ui/error-alert';
 
@@ -32,66 +32,67 @@ export const UserList: React.FC = () => {
   // ahora manejamos clientes en lugar de usuarios genéricos
   const [clients, setClients] = React.useState<Client[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [filter, setFilter] = React.useState<UserFilter>({});
+  const [filter, setFilter] = React.useState<UserFilter>({} as UserFilter);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [page, setPage] = React.useState(1);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
-  const [userToDelete, setUserToDelete] = React.useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = React.useState<Client | null>(null);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [error, setError] = React.useState<any>(null);
-  
+
   const rowsPerPage = 10;
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  
+
   const filteredUsers = React.useMemo(() => {
     return clients.filter(user => {
-      const matchesRole = !filter.rol || user.rol === filter.rol;
-      const matchesSearch = !searchQuery || 
+      const matchesRole = !filter.rol || user.usuario?.rol === filter.rol;
+      const matchesSearch = !searchQuery ||
         user.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       return matchesRole && matchesSearch;
     });
   }, [clients, filter, searchQuery]);
-  
+
   const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
-  
+
+  const fetchClients = async () => {
+    setLoading(true);
+    try {
+      const data = await clientApi.getAll();
+      setClients(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   React.useEffect(() => {
-    const fetchClients = async () => {
-      setLoading(true);
-      try {
-        const data = await clientApi.getAll();
-        setClients(data);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchClients();
   }, []);
-  
+
   const handleFilterChange = (key: keyof UserFilter, value: any) => {
     setFilter(prev => ({ ...prev, [key]: value }));
     setPage(1);
   };
-  
+
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setPage(1);
   };
-  
-  const handleDeleteClick = (user: User) => {
+
+  const handleDeleteClick = (user: Client) => {
     setUserToDelete(user);
     setDeleteModalOpen(true);
   };
-  
+
   const handleDeleteConfirm = async () => {
     if (!userToDelete?.id) return;
-    
+
     try {
       setIsDeleting(true);
-      await userApi.delete(userToDelete.id);
+      await clientApi.delete(userToDelete.id);
       setClients(clients.filter(user => user.id !== userToDelete.id));
       addToast({
         title: 'Usuario eliminado',
@@ -111,13 +112,13 @@ export const UserList: React.FC = () => {
       setUserToDelete(null);
     }
   };
-  
+
   const roleColorMap: Record<string, "default" | "primary" | "secondary" | "success" | "warning" | "danger"> = {
     ADMIN: 'danger',
     CLIENTE: 'success',
     ENTRENADOR: 'primary'
   };
-  
+
   const renderRoleChip = (role: string) => {
     return (
       <Chip color={roleColorMap[role] || 'default'} size="sm">
@@ -125,34 +126,34 @@ export const UserList: React.FC = () => {
       </Chip>
     );
   };
-  
+
   return (
     <div>
-      <PageHeader 
-        title="Usuarios" 
-        description="Gestiona los usuarios del sistema" 
+      <PageHeader
+        title="Usuarios"
+        description="Gestiona los usuarios del sistema"
         actionLabel="Crear Usuario"
         actionPath="/usuarios/crear"
       />
-      
+
       {error && (
-        <ErrorAlert 
-          error={error} 
-          onRetry={fetchUsers} 
-          onDismiss={() => setError(null)} 
+        <ErrorAlert
+          error={error}
+          onRetry={fetchClients}
+          onDismiss={() => setError(null)}
         />
       )}
-      
+
       <div className="bg-content1 rounded-lg shadow-sm overflow-hidden">
         <div className="p-4 flex flex-col sm:flex-row gap-4">
           <Input
             placeholder="Buscar por nombre o email..."
             startContent={<Icon icon="lucide:search" className="h-4 w-4 text-default-400" />}
-            value={searchQuery}
+            value={searchQuery || ''}
             onValueChange={handleSearchChange}
             className="sm:max-w-xs"
           />
-          
+
           <Select
             placeholder="Filtrar por rol"
             selectedKeys={filter.rol ? [filter.rol] : []}
@@ -162,12 +163,12 @@ export const UserList: React.FC = () => {
             }}
             className="sm:max-w-xs"
           >
-            <SelectItem key="ADMIN" value="ADMIN">Administrador</SelectItem>
-            <SelectItem key="CLIENTE" value="CLIENTE">Cliente</SelectItem>
-            <SelectItem key="ENTRENADOR" value="ENTRENADOR">Entrenador</SelectItem>
+            <SelectItem key="ADMIN">Administrador</SelectItem>
+            <SelectItem key="CLIENTE">Cliente</SelectItem>
+            <SelectItem key="ENTRENADOR">Entrenador</SelectItem>
           </Select>
-          
-          <Button 
+
+          <Button
             variant="flat"
             color="primary"
             onPress={() => {
@@ -181,7 +182,7 @@ export const UserList: React.FC = () => {
             Reiniciar
           </Button>
         </div>
-        
+
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <Spinner size="lg" color="primary" />
@@ -208,7 +209,7 @@ export const UserList: React.FC = () => {
                   <TableRow key={user.id}>
                     <TableCell>{user.nombre}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{renderRoleChip(user.rol)}</TableCell>
+                    <TableCell>{renderRoleChip(user.usuario?.rol || 'CLIENTE')}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Dropdown>
@@ -247,12 +248,12 @@ export const UserList: React.FC = () => {
                 ))}
               </TableBody>
             </Table>
-            
+
             <div className="flex justify-between items-center p-4">
               <p className="text-sm text-default-500">
                 Mostrando {Math.min(filteredUsers.length, startIndex + 1)}-{Math.min(filteredUsers.length, endIndex)} de {filteredUsers.length} usuarios
               </p>
-              
+
               <Pagination
                 total={totalPages}
                 initialPage={1}
@@ -263,7 +264,7 @@ export const UserList: React.FC = () => {
           </>
         )}
       </div>
-      
+
       <ConfirmationModal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
