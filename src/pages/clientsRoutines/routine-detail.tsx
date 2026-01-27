@@ -152,100 +152,78 @@ const RoutineDetailPage = () => {
             <Header
                 title={routine.nombre}
                 showBackButton
-                action={
-                    <Button
-                        className="bg-primary text-white font-bold shadow-lg shadow-primary/30"
-                        radius="full"
-                        size="sm"
-                        isDisabled={dailyExercises.length === 0}
-                        onPress={() => navigate(`/cliente-app/training/${routine.id}/${selectedDay}`)}
-                        startContent={<Icon icon="lucide:play" width={16} />}
-                    >
-                        Iniciar
-                    </Button>
-                }
             />
 
-            <div className="p-4">
+            <div className="pb-32"> {/* Extra padding for sticky footer */}
                 <div className="max-w-4xl mx-auto">
-                    <Card className="mb-8 border-none shadow-md rounded-3xl overflow-hidden">
-                        <CardBody className="p-0">
-                            <div className="relative h-48 bg-gray-900 flex items-center justify-center">
-                                <img
-                                    src="/gym-hero.jpg"
-                                    alt="Training Hero"
-                                    className="absolute inset-0 w-full h-full object-cover opacity-80"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex items-center gap-2">
-                                            <Chip
-                                                size="sm"
-                                                variant="solid"
-                                                classNames={{
-                                                    base: "bg-success/90 backdrop-blur-md",
-                                                    content: "text-white font-bold text-[10px] tracking-wider uppercase px-1"
-                                                }}
-                                            >
-                                                {routine.estado}
-                                            </Chip>
-                                            <Chip
-                                                size="sm"
-                                                variant="solid"
-                                                classNames={{
-                                                    base: "bg-white/20 backdrop-blur-md border border-white/30",
-                                                    content: "text-white font-bold text-[10px] tracking-wider uppercase px-1"
-                                                }}
-                                            >
-                                                {routine.enfoque}
-                                            </Chip>
-                                        </div>
-                                    </div>
+                    <div className="relative h-56 bg-zinc-900 overflow-hidden mb-6 sm:rounded-3xl sm:mx-4 shadow-xl">
+                        <img
+                            src="/gym-hero.jpg"
+                            alt="Training Hero"
+                            className="absolute inset-0 w-full h-full object-cover opacity-60 scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent p-6 flex flex-col justify-end">
+                            <div className="space-y-3">
+                                <div className="flex gap-2">
+                                    <Chip
+                                        size="sm"
+                                        variant="solid"
+                                        className="bg-success text-white font-black text-[9px] uppercase tracking-wider h-5"
+                                    >
+                                        {routine.estado}
+                                    </Chip>
+                                    <Chip
+                                        size="sm"
+                                        variant="flat"
+                                        className="bg-white/10 backdrop-blur-md text-white border border-white/20 font-black text-[9px] uppercase tracking-wider h-5"
+                                    >
+                                        {routine.enfoque}
+                                    </Chip>
                                 </div>
+                                <h1 className="text-2xl font-black text-white leading-tight drop-shadow-lg">
+                                    {routine.nombre}
+                                </h1>
                             </div>
-                        </CardBody>
-                    </Card>
-
-                    <div className="mb-4">
-                        <Tabs
-                            aria-label="Días de entrenamiento"
-                            selectedKey={selectedDay.toString()}
-                            onSelectionChange={(key) => setSelectedDay(parseInt(key as string))}
-                            variant="underlined"
-                            color="primary"
-                            classNames={{
-                                tabList: "overflow-x-auto scrollbar-hidden",
-                                cursor: "bg-primary"
-                            }}
-                        >
-                            {availableDays.length > 0 ? (
-                                availableDays.map((day) => (
-                                    <Tab key={day.toString()} title={dayNames[day] || `Día ${day}`} />
-                                ))
-                            ) : (
-                                <Tab key="1" title="Sin días" />
-                            )}
-                        </Tabs>
+                        </div>
                     </div>
 
-                    <div className="mb-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold">
-                                {dayNames[selectedDay] || `Día ${selectedDay}`}
-                            </h3>
-                            <Button
-                                className="bg-primary text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                                size="md"
-                                radius="full"
-                                isDisabled={dailyExercises.length === 0}
-                                onPress={() => navigate(`/cliente-app/training/${routine.id}/${selectedDay}`)}
-                                startContent={<Icon icon="lucide:play" width={20} className="fill-current" />}
-                            >
-                                INICIAR ENTRENAMIENTO
-                            </Button>
+                    <div className="px-4 mb-6">
+                        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-2 -mx-4 px-4">
+                            {availableDays.length > 0 ? (
+                                availableDays.map((day) => (
+                                    <Button
+                                        key={day}
+                                        onPress={() => setSelectedDay(day)}
+                                        className={`min-w-fit h-10 px-6 font-bold rounded-2xl transition-all ${selectedDay === day
+                                                ? "bg-primary text-white shadow-lg shadow-primary/30 scale-105"
+                                                : "bg-default-100 text-foreground-500 border border-divider/50"
+                                            }`}
+                                        variant={selectedDay === day ? "solid" : "flat"}
+                                        size="sm"
+                                    >
+                                        {dayNames[day] || `Día ${day}`}
+                                    </Button>
+                                ))
+                            ) : (
+                                <Chip>Sin días</Chip>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="px-4 mb-8">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="space-y-1">
+                                <h3 className="text-xl font-black text-foreground-900">
+                                    {dayNames[selectedDay] || `Día ${selectedDay}`}
+                                </h3>
+                                <p className="text-xs font-bold text-foreground-400 uppercase tracking-widest flex items-center gap-1.5 focus-within:">
+                                    <Icon icon="lucide:list-todo" className="text-primary" />
+                                    {dailyExercises.length} Ejercicios planificados
+                                </p>
+                            </div>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {(() => {
                                 const sortedExercises = [...dailyExercises].sort((a, b) => {
                                     const groupA = a.esBiSerie ? (a.biSerieGrupo || 0) : 999;
@@ -275,13 +253,12 @@ const RoutineDetailPage = () => {
                                 return groupedExercises.map((group, groupIndex) => {
                                     if (group.isBiSerie) {
                                         return (
-                                            <div key={`group-${group.biSerieGrupo}-${groupIndex}`} className="mb-4 p-3 sm:p-4 border border-primary/20 bg-primary/5 rounded-2xl relative overflow-hidden">
-                                                <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-                                                <div className="flex items-center gap-2 mb-3 ml-1">
-                                                    <Icon icon="mdi:link-variant" className="text-primary" width={18} />
-                                                    <span className="text-xs font-black uppercase tracking-widest text-primary">Bi-serie Grupo {group.biSerieGrupo}</span>
+                                            <div key={`group-${group.biSerieGrupo}-${groupIndex}`} className="mb-2 p-1 border-l-4 border-primary bg-primary/5 rounded-r-2xl overflow-hidden">
+                                                <div className="flex items-center gap-2 py-2 px-3">
+                                                    <Icon icon="mdi:link-variant" className="text-primary" width={14} />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Bi-serie {group.biSerieGrupo}</span>
                                                 </div>
-                                                <div className="flex flex-col gap-3">
+                                                <div className="flex flex-col gap-2">
                                                     {group.exercises.map((exercise, index) => (
                                                         <ExerciseCard
                                                             key={exercise.id}
@@ -334,6 +311,23 @@ const RoutineDetailPage = () => {
                             )}
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Sticky Action Footer */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-gradient-to-t from-white via-white to-transparent z-50">
+                <div className="max-w-md mx-auto">
+                    <Button
+                        className={`w-full h-16 rounded-2xl font-black text-lg transition-all shadow-xl ${dailyExercises.length === 0
+                                ? "bg-default-200 text-default-400"
+                                : "bg-primary text-white shadow-primary/40 hover:scale-[1.02] active:scale-[0.95]"
+                            }`}
+                        isDisabled={dailyExercises.length === 0}
+                        onPress={() => navigate(`/cliente-app/training/${routine.id}/${selectedDay}`)}
+                        startContent={<Icon icon="lucide:play" width={24} className="fill-current" />}
+                    >
+                        INICIAR ENTRENAMIENTO
+                    </Button>
                 </div>
             </div>
         </PageTransition>

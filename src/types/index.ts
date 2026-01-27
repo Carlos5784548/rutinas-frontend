@@ -184,6 +184,7 @@ export interface RutinaEjercicioResponseDTO {
   esBiSerie?: boolean;
   biSerieGrupo?: number | null;
   orden?: number;
+  videoUrl?: string;
 }
 
 export interface ProgresoEjercicioRequestDTO {

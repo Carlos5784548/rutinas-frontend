@@ -7,7 +7,6 @@ import { Header } from '../../components/clientes-components/header';
 import { PageTransition } from '../../components/clientes-components/page-transition';
 import { exerciseApi, clientApi, getClienteId } from '../../services/api';
 import { Exercise, ProgresoEjercicioResponseDTO } from '../../types';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const MediaRenderer = ({ url, alt }: { url: string; alt: string }) => {
     const [error, setError] = React.useState(false);
@@ -72,6 +71,7 @@ const ExerciseDetailPage = () => {
     const [exercise, setExercise] = React.useState<Exercise | null>(null);
     const [weightHistory, setWeightHistory] = React.useState<{ fecha: string, peso: number }[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const [errorOccurred, setErrorOccurred] = React.useState(false);
 
     const muscleGroupColors: Record<string, "primary" | "secondary" | "success" | "warning" | "danger" | "default"> = {
         'Pecho': 'primary',
@@ -99,18 +99,22 @@ const ExerciseDetailPage = () => {
 
                 setExercise(exerciseData);
 
-                // Filtrar progreso por este ejercicio y mapear para el gráfico
-                const exerciseProgress = progressData
-                    .filter(p => p.rutinaEjercicioId === parseInt(id) || p.ejercicioNombre === exerciseData.nombre)
-                    .map(p => ({
-                        fecha: p.fecha,
-                        peso: p.kg || p.peso || 0
-                    }))
-                    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+                if (exerciseData && progressData) {
+                    // Filtrar progreso por este ejercicio y mapear para el gráfico
+                    const exerciseProgress = progressData
+                        .filter(p => p.rutinaEjercicioId === parseInt(id) || p.ejercicioNombre === exerciseData.nombre)
+                        .map(p => ({
+                            fecha: p.fecha,
+                            peso: p.kg || p.peso || 0
+                        }))
+                        .filter(p => !isNaN(new Date(p.fecha).getTime())) // Filtro de fechas inválidas
+                        .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
 
-                setWeightHistory(exerciseProgress);
+                    setWeightHistory(exerciseProgress);
+                }
             } catch (error) {
                 console.error("Error fetching exercise details:", error);
+                setErrorOccurred(true);
             } finally {
                 setLoading(false);
             }
@@ -127,14 +131,24 @@ const ExerciseDetailPage = () => {
         );
     }
 
-    if (!exercise) {
+    if (errorOccurred || (!loading && !exercise)) {
         return (
-            <div className="flex flex-col items-center justify-center h-[80vh] p-4">
+            <div className="flex flex-col items-center justify-center h-[80vh] p-4 text-center">
                 <Icon icon="lucide:alert-circle" className="text-4xl text-danger mb-4" />
-                <h2 className="text-xl font-semibold mb-2">Ejercicio no encontrado</h2>
-                <Button color="primary" onPress={() => navigate('/cliente-app/exercises')}>
-                    Ver todos los ejercicios
-                </Button>
+                <h2 className="text-xl font-semibold mb-2">
+                    {errorOccurred ? "Ocurrió un error al cargar el ejercicio" : "Ejercicio no encontrado"}
+                </h2>
+                <p className="text-foreground-500 mb-6 text-sm max-w-xs">
+                    Intenta recargar la página o vuelve a la biblioteca.
+                </p>
+                <div className="flex flex-col gap-2 w-full max-w-xs">
+                    <Button color="primary" onPress={() => window.location.reload()}>
+                        Recargar página
+                    </Button>
+                    <Button variant="flat" onPress={() => navigate('/cliente-app/exercises')}>
+                        Volver a la Biblioteca
+                    </Button>
+                </div>
             </div>
         );
     }
@@ -187,26 +201,60 @@ const ExerciseDetailPage = () => {
                         </CardBody>
                     </Card>
 
+                    <Card className="mb-6 bg-primary/5 border-none shadow-none">
+                        <CardBody className="flex flex-row items-center justify-between p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
+                                    <Icon icon="lucide:trophy" width={24} />
+                                </div>
+                                <div>
+                                    <p className="text-tiny font-bold uppercase tracking-wider text-primary/60">Récord Personal</p>
+                                    <h3 className="text-2xl font-black text-primary">
+                                        {weightHistory.length > 0
+                                            ? `${Math.max(...weightHistory.map(p => p.peso))} kg`
+                                            : '-- kg'}
+                                    </h3>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-tiny font-medium text-foreground-400">Total registros</p>
+                                <p className="text-small font-bold">{weightHistory.length}</p>
+                            </div>
+                        </CardBody>
+                    </Card>
+
                     <Card className="mb-6">
-                        <CardBody>
-                            <h3 className="font-semibold mb-4 text-center">Progreso Histórico (kg)</h3>
-                            <div className="h-48">
+                        <CardBody className="p-4">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Icon icon="lucide:history" className="text-primary" />
+                                <h3 className="font-bold">Últimos Registros</h3>
+                            </div>
+
+                            <div className="space-y-3">
                                 {weightHistory.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={weightHistory}>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--heroui-divider)" />
-                                            <XAxis dataKey="fecha" tick={{ fontSize: 10 }} stroke="var(--heroui-foreground-400)" />
-                                            <YAxis tick={{ fontSize: 10 }} stroke="var(--heroui-foreground-400)" />
-                                            <Tooltip
-                                                contentStyle={{ backgroundColor: 'var(--heroui-content1)', border: '1px solid var(--heroui-divider)', borderRadius: '8px' }}
-                                                formatter={(value) => [`${value} kg`, 'Peso']}
-                                            />
-                                            <Line type="monotone" dataKey="peso" stroke="var(--heroui-primary)" strokeWidth={2} dot={{ r: 4 }} />
-                                        </LineChart>
-                                    </ResponsiveContainer>
+                                    [...weightHistory].reverse().slice(0, 5).map((record, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-default-50 border border-divider/50">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary">
+                                                    <Icon icon="lucide:calendar" width={14} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-bold text-foreground-900">
+                                                        {new Date(record.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                                                    </p>
+                                                    <p className="text-[10px] text-foreground-400 uppercase font-medium">Entrenamiento</p>
+                                                </div>
+                                            </div>
+                                            <div className="bg-white px-3 py-1.5 rounded-lg shadow-sm border border-divider">
+                                                <span className="text-base font-black text-primary">{record.peso}</span>
+                                                <span className="text-[10px] font-bold text-foreground-400 ml-1">KG</span>
+                                            </div>
+                                        </div>
+                                    ))
                                 ) : (
-                                    <div className="h-full flex items-center justify-center">
-                                        <p className="text-foreground-500 text-small">No hay registros de peso para este ejercicio.</p>
+                                    <div className="text-center py-8">
+                                        <Icon icon="lucide:clipboard-list" className="mx-auto text-3xl text-default-300 mb-2" />
+                                        <p className="text-foreground-500 text-small">No hay registros de peso aún.</p>
                                     </div>
                                 )}
                             </div>

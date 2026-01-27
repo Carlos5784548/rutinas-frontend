@@ -20,8 +20,7 @@ import { ExerciseCreate } from './pages/exercises/exercise-create';
 import { ExerciseEdit } from './pages/exercises/exercise-edit';
 import { Login } from './pages/auth/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { getUserRole, checkBackendHealth } from './services/api';
-import { ServerStartup } from './components/startup/ServerStartup';
+import { getUserRole } from './services/api';
 import { TrainerProfile } from './pages/trainer/profile';
 import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
@@ -79,44 +78,6 @@ const TrainerRegister: React.FC = () => {
 };
 
 function App() {
-  const [isServerReady, setIsServerReady] = useState(false);
-  const [showLoading, setShowLoading] = useState(false);
-
-  useEffect(() => {
-    let timer: any;
-
-    const checkServer = async () => {
-      const start = Date.now();
-
-      // If server doesn't respond in 500ms, show the wakeup screen
-      // This prevents flashing the screen for users with warm servers
-      timer = setTimeout(() => {
-        setShowLoading(true);
-      }, 500);
-
-      await checkBackendHealth();
-
-      clearTimeout(timer);
-
-      const elapsed = Date.now() - start;
-
-      // Add a small delay for smooth transition if it was showing
-      if (elapsed > 500) {
-        setTimeout(() => setIsServerReady(true), 500);
-      } else {
-        setIsServerReady(true);
-      }
-    };
-
-    checkServer();
-    return () => clearTimeout(timer);
-  }, []); // Run once on mount
-
-  if (!isServerReady) {
-    if (showLoading) return <ServerStartup />;
-    return <div className="min-h-screen bg-zinc-950" />; // Empty dark screen while checking < 500ms
-  }
-
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

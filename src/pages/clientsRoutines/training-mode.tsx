@@ -6,8 +6,66 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '../../components/clientes-components/header';
 import { Timer } from '../../components/clientes-components/timer';
 import { PageTransition } from '../../components/clientes-components/page-transition';
-import { clientApi, getClienteId } from '../../services/api';
+import { clientApi, getClienteId, exerciseApi } from '../../services/api';
 import { RutinaEjercicioResponseDTO, ProgresoEjercicioRequestDTO } from '../../types';
+
+const MediaRenderer = ({ url, alt }: { url: string; alt: string }) => {
+    const [error, setError] = React.useState(false);
+
+    if (error || !url) {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 bg-primary/10 text-primary/40">
+                <Icon icon="lucide:dumbbell" width={80} />
+            </div>
+        );
+    }
+
+    const getYoutubeId = (url: string) => {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    };
+
+    const youtubeId = getYoutubeId(url);
+    const isVideoFile = url.match(/\.(mp4|webm|ogg|mov)$/i);
+
+    if (youtubeId) {
+        return (
+            <div className="w-full aspect-video">
+                <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                ></iframe>
+            </div>
+        );
+    } else if (isVideoFile) {
+        return (
+            <video
+                src={url}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+                onError={() => setError(true)}
+            />
+        );
+    } else {
+        return (
+            <img
+                src={url}
+                alt={alt}
+                className="w-full h-full object-cover"
+                onError={() => setError(true)}
+            />
+        );
+    }
+};
 
 const TrainingModePage = () => {
     const { routineId, dayId } = useParams<{ routineId: string; dayId: string }>();
@@ -31,14 +89,25 @@ const TrainingModePage = () => {
             }
 
             try {
-                const [exercisesData, allProgress] = await Promise.all([
+                const [exercisesData, allProgress, allExercisesLookup] = await Promise.all([
                     clientApi.getRoutineExercises(clienteId, parseInt(routineId)),
-                    clientApi.getMyProgress(clienteId)
+                    clientApi.getMyProgress(clienteId),
+                    exerciseApi.getAll()
                 ]);
 
                 const exercisesList = Array.isArray(exercisesData) ? exercisesData : [];
+
+                // Enriquecer con videoUrl del catálogo de ejercicios
+                const enrichedExercises = exercisesList.map(re => {
+                    const exerciseInfo = allExercisesLookup.find(e => e.id === re.ejercicioId);
+                    return {
+                        ...re,
+                        videoUrl: exerciseInfo?.videoUrl
+                    };
+                });
+
                 // Filtrar por el día seleccionado
-                const dayExercises = exercisesList.filter(e => e.dia === parseInt(dayId));
+                const dayExercises = enrichedExercises.filter(e => e.dia === parseInt(dayId));
                 setExercises(dayExercises);
 
                 // --- Reconstrucción del Estado Senior ---
@@ -300,8 +369,11 @@ const TrainingModePage = () => {
                             >
                                 <Card className="mb-6 overflow-hidden">
                                     <CardBody className="p-0">
-                                        <div className="relative h-48 bg-primary/20 flex items-center justify-center">
-                                            <Icon icon="lucide:dumbbell" className="text-primary/40" width={100} />
+                                        <div className="relative h-64 bg-black flex items-center justify-center">
+                                            <MediaRenderer
+                                                url={currentExercise.videoUrl || ""}
+                                                alt={currentExercise.ejercicioNombre}
+                                            />
                                         </div>
                                         <div className="p-4">
                                             <div className="flex justify-between items-start mb-2">
